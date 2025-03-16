@@ -40,8 +40,7 @@ namespace SnapExit.Services
         /// </summary>
         public void StopExecution()
         {
-            ResponseData = DefaultReponse;
-            _cancellationTokenSource.Cancel();
+            StopExecution(DefaultReponse);
         }
     }
 }
