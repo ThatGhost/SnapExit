@@ -4,7 +4,7 @@ using SnapExit.Interfaces;
 
 namespace SnapExit.Services
 {
-    public class ExcecutionControlService : IExcecutionControlService
+    public class ExecutionControlService : IExecutionControlService
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private CancellationToken Token => _cancellationTokenSource.Token;
@@ -15,7 +15,7 @@ namespace SnapExit.Services
 
         public CustomResponseData DefaultReponse { get; }
 
-        internal ExcecutionControlService(IOptions<SnapExitOptions> options)
+        internal ExecutionControlService(IOptions<SnapExitOptions> options)
         {
             DefaultReponse = new CustomResponseData
             {
