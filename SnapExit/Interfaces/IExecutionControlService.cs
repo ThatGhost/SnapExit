@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SnapExit.Interfaces
 {
-    public interface IExcecutionControlService
+    public interface IExecutionControlService
     {
         /// <summary>
         /// Stops the current request execution and returns the provided response to the client

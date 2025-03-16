@@ -15,8 +15,8 @@ namespace SnapExit
                 options?.Invoke(configoptions);
             });
 
-            services.AddScoped<IExcecutionControlService, ExcecutionControlService>();
-            services.AddScoped<ExcecutionControlService>(provider => (ExcecutionControlService)provider.GetRequiredService<IExcecutionControlService>());
+            services.AddScoped<IExecutionControlService, ExecutionControlService>();
+            services.AddScoped<ExecutionControlService>(provider => (ExecutionControlService)provider.GetRequiredService<IExecutionControlService>());
             return services;
         }
 

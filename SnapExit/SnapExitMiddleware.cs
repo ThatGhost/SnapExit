@@ -9,9 +9,9 @@ namespace SnapExit
     internal class SnapExitMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ExcecutionControlService _excecutionControlService;
+        private readonly ExecutionControlService _excecutionControlService;
 
-        public SnapExitMiddleware(RequestDelegate next, ExcecutionControlService excecutionControlService)
+        public SnapExitMiddleware(RequestDelegate next, ExecutionControlService excecutionControlService)
         {
             _next = next;
             _excecutionControlService = excecutionControlService;
