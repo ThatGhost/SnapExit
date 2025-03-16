@@ -15,7 +15,7 @@ namespace SnapExit.Services
 
         public CustomResponseData DefaultReponse { get; }
 
-        internal ExecutionControlService(IOptions<SnapExitOptions> options)
+        public ExecutionControlService(IOptions<SnapExitOptions> options)
         {
             DefaultReponse = new CustomResponseData
             {
