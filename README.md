@@ -23,12 +23,18 @@ Inject the excecution controll service into your flow and use it like you would 
 ```csharp
   public class YourService {
       private readonly IExecutionControlService _executionControlService;
-      public YourService(IExecutionControlService excecutionControlService) {
-          _executionControlService = excecutionControlService;
+      public YourService(IExecutionControlService executionControlService) {
+          _executionControlService = executionControlService;
       }
 
+      // New way
       public Task ThisShouldThrow() {
-          _executionControlService.StopExcecution();
+          _executionControlService.StopExecution();
+      }
+
+      // Old way
+      public Task ThisShouldThrow() {
+          throw new Exception();
       }
   }
 ```
@@ -36,7 +42,7 @@ Inject the excecution controll service into your flow and use it like you would 
 This will halt the flow of the request and immediatly return a response to the client.
 You can also return a specialized response like so (body and headers are optional)
 ```csharp
-  _executionControlService.StopExcecution(new CustomResponseData() {
+  _executionControlService.StopExecution(new CustomResponseData() {
       StatusCode = 404,
       Body = new { message = "Not found" },
       Headers = new IDictionary<string, string>{ { "Authentication":"123abc456def" } }
@@ -50,19 +56,19 @@ for example.
 ```csharp
 public class ErrorService {
     private readonly IExecutionControlService _executionControlService;
-    public YourService(IExecutionControlService excecutionControlService) {
-        _executionControlService = excecutionControlService;
+    public YourService(IExecutionControlService executionControlService) {
+        _executionControlService = executionControlService;
     }
 
     public void NotFound(string message) {
-        _executionControlService.StopExcecution(new CustomResponseData() {
+        _executionControlService.StopExecution(new CustomResponseData() {
             StatusCode = 404,
             Body = new { message = message }
         });
     }
 
     public void Unauthorized() {
-        _executionControlService.StopExcecution(new CustomResponseData() {
+        _executionControlService.StopExecution(new CustomResponseData() {
             StatusCode = 401,
         });
     }
