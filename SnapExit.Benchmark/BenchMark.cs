@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.TestHost;
 using System.Diagnostics;
-using System;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;

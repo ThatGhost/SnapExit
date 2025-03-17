@@ -18,7 +18,7 @@ Register snap exit in your program.cs
     app.AddSnapExit(); // registers the middleware
 ```
 
-Inject the excecution controll service into your flow and use it like you would an exception;
+Inject the execution controll service into your flow and use it like you would an exception;
 
 ```csharp
   public class YourService {
@@ -48,7 +48,7 @@ You can also return a specialized response like so (body and headers are optiona
       Headers = new IDictionary<string, string>{ { "Authentication":"123abc456def" } }
   });
 ```
-## Recomendation
+## Recommendation
 
 I recommend creating your own service that has specialized reponses based on events.
 for example.
