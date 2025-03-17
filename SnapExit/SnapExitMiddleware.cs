@@ -15,7 +15,7 @@ namespace SnapExit
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ExecutionControlService excecutionControlService)
+        public async Task Invoke(HttpContext context, ExecutionControlService excecutionControlService, IResponseBodySerializer serializer)
         {
             var token = excecutionControlService.GetToken();
 
@@ -26,21 +26,19 @@ namespace SnapExit
                 var task = _next(context);
                 var completedTask = await Task.WhenAny(task, tokenTask);
 
-                //if (!task.IsCompleted) await task;
                 if (completedTask == task)
                 {
                     excecutionControlService.StopExecution();
                     return;
                 }
 
-                // Eearly ckecks
+                // Early ckecks
                 var responseData = excecutionControlService.GetResponseData();
                 if (!token.IsCancellationRequested) return;
                 if (context.Response.HasStarted) return;
-                if (responseData == null) return;
 
                 // write response 
-                await WriteResponse(context, responseData);
+                await WriteResponse(context, serializer, excecutionControlService);
             }
             catch (Exception)
             {
@@ -48,9 +46,11 @@ namespace SnapExit
             }
         }
 
-        private async Task WriteResponse(HttpContext context, CustomResponseData responseData)
+        private async Task WriteResponse(HttpContext context, IResponseBodySerializer serializer, ExecutionControlService excecutionControlService)
         {
             // Write response
+            var responseData = excecutionControlService.GetResponseData();
+            if (responseData == null) return;
             context.Response.StatusCode = responseData.StatusCode;
 
             if (responseData.Headers != null)
@@ -61,9 +61,8 @@ namespace SnapExit
                 }
             }
 
-            context.Response.ContentType = "application/json";
-            var json = JsonSerializer.Serialize(responseData.Body);
-            await context.Response.WriteAsync(json);
+            context.Response.ContentType = serializer.ContentType;
+            await context.Response.WriteAsync(serializer.GetBody(responseData));
         }
     }
 }

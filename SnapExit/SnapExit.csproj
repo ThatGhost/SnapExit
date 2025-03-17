@@ -11,10 +11,16 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>Do you hate result objects? but exceptions are too slow? Try this!!</Description>
     <PackageProjectUrl>https://www.nuget.org/packages/SnapExit/</PackageProjectUrl>
+    <PackageIcon>snapexit.png</PackageIcon>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\README.md">
+    <None Remove="Resources\snapexit.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Link="Resources\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
@@ -24,6 +30,14 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\snapexit.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

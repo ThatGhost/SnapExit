@@ -2,6 +2,9 @@
 using SnapExit.Entities;
 using SnapExit.Interfaces;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 namespace SnapExit.Services
 {
@@ -10,10 +13,11 @@ namespace SnapExit.Services
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private CancellationToken Token => _cancellationTokenSource.Token;
         private CustomResponseData? ResponseData = null;
-        
-        internal CancellationToken GetToken() => Token;
-        internal CustomResponseData? GetResponseData() => ResponseData;
 
+        internal CancellationToken GetToken() => Token;
+        internal CustomResponseData GetResponseData() => ResponseData ?? DefaultReponse;
+
+        public Func<object,string>? CustomResponseSerializer { get; set; }
         public CustomResponseData DefaultReponse { get; }
 
         public ExecutionControlService(IOptions<SnapExitOptions> options)
@@ -24,6 +28,7 @@ namespace SnapExit.Services
                 Body = options.Value.DefaultBody,
                 Headers = options.Value.DefaultHeaders
             };
+            CustomResponseSerializer = options.Value.CustomResponseSerializer;
         }
 
         /// <summary>
@@ -34,7 +39,7 @@ namespace SnapExit.Services
         public void StopExecution(CustomResponseData customResponseData)
         {
             ResponseData = customResponseData;
-            _cancellationTokenSource.Cancel();
+            StopExecution();
         }
 
         /// <summary>
@@ -43,7 +48,7 @@ namespace SnapExit.Services
         [DoesNotReturn]
         public void StopExecution()
         {
-            StopExecution(DefaultReponse);
+            _cancellationTokenSource.Cancel();
         }
     }
 }
