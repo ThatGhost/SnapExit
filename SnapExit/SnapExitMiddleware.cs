@@ -9,34 +9,32 @@ namespace SnapExit
     internal class SnapExitMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ExecutionControlService _excecutionControlService;
 
-        public SnapExitMiddleware(RequestDelegate next, ExecutionControlService excecutionControlService)
+        public SnapExitMiddleware(RequestDelegate next)
         {
             _next = next;
-            _excecutionControlService = excecutionControlService;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task Invoke(HttpContext context, ExecutionControlService excecutionControlService)
         {
-            var token = _excecutionControlService.GetToken();
+            var token = excecutionControlService.GetToken();
 
             try
             {
                 // Setup task race
-                var task = _next(context);
                 using var tokenTask = Task.Delay(Timeout.Infinite, token);
+                var task = _next(context);
                 var completedTask = await Task.WhenAny(task, tokenTask);
 
-                // Normal request
+                //if (!task.IsCompleted) await task;
                 if (completedTask == task)
                 {
-                    await task;
+                    excecutionControlService.StopExecution();
                     return;
                 }
 
                 // Eearly ckecks
-                var responseData = _excecutionControlService.GetResponseData();
+                var responseData = excecutionControlService.GetResponseData();
                 if (!token.IsCancellationRequested) return;
                 if (context.Response.HasStarted) return;
                 if (responseData == null) return;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SnapExit.Interfaces;
+using SnapExit.Services;
 
 namespace SnapExit.Benchmark
 {
@@ -7,9 +8,9 @@ namespace SnapExit.Benchmark
     [Route("[controller]")]
     public class BenchMarkController : ControllerBase
     {
-        private readonly IExecutionControlService _service;
+        private readonly ExecutionControlService _service;
 
-        public BenchMarkController(IExecutionControlService service)
+        public BenchMarkController(ExecutionControlService service)
         {
             _service = service;
         }
@@ -27,9 +28,10 @@ namespace SnapExit.Benchmark
         }
 
         [HttpGet("SnapExit")]
-        public void SnapExit()
+        public async Task SnapExit()
         {
             _service.StopExecution();
+            await Task.Delay(5000);
         }
     }
 

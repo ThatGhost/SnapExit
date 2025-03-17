@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using SnapExit.Entities;
 using SnapExit.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SnapExit.Services
 {
@@ -29,6 +30,7 @@ namespace SnapExit.Services
         /// Stops the current request execution and returns the provided response to the client
         /// </summary>
         /// <param name="customResponseData">the response to send to the client</param>
+        [DoesNotReturn]
         public void StopExecution(CustomResponseData customResponseData)
         {
             ResponseData = customResponseData;
@@ -38,6 +40,7 @@ namespace SnapExit.Services
         /// <summary>
         /// Stops the current request execution and returns the default response to the client
         /// </summary>
+        [DoesNotReturn]
         public void StopExecution()
         {
             StopExecution(DefaultReponse);
