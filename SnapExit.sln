@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapExit", "SnapExit\SnapEx
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapExit.Benchmark", "SnapExit.Benchmark\SnapExit.Benchmark.csproj", "{61069852-B65C-4EE2-8CC5-59BC41552FDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapExit.Example", "SnapExit.Example\SnapExit.Example.csproj", "{50E372A5-739E-4CD6-8E2B-CF47A55C450C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{61069852-B65C-4EE2-8CC5-59BC41552FDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{61069852-B65C-4EE2-8CC5-59BC41552FDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61069852-B65C-4EE2-8CC5-59BC41552FDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50E372A5-739E-4CD6-8E2B-CF47A55C450C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50E372A5-739E-4CD6-8E2B-CF47A55C450C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50E372A5-739E-4CD6-8E2B-CF47A55C450C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50E372A5-739E-4CD6-8E2B-CF47A55C450C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

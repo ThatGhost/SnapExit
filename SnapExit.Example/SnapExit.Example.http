@@ -1,0 +1,6 @@
+@SnapExit.Example_HostAddress = http://localhost:5043
+
+GET {{SnapExit.Example_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
