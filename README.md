@@ -1,6 +1,6 @@
 
 # Snap exit
-
+nuget link: [SnapExit](https://www.nuget.org/packages/SnapExit/)
 A middleware package that allows for exception like behaviour to validate state in a given ASP.NET Core API project. But with all the performance benifits of cancelation tokens.
 
 Any feedback is helpfull. Please leave it in the Issues section
