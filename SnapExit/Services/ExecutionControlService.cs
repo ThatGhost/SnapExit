@@ -11,10 +11,9 @@ namespace SnapExit.Services
     public class ExecutionControlService : IExecutionControlService
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new();
-        private CancellationToken Token => _cancellationTokenSource.Token;
         private CustomResponseData? ResponseData = null;
 
-        internal CancellationToken GetToken() => Token;
+        internal CancellationTokenSource GetTokenSource() => _cancellationTokenSource;
         internal CustomResponseData GetResponseData() => ResponseData ?? DefaultReponse;
 
         public Func<object,string>? CustomResponseSerializer { get; set; }
@@ -49,6 +48,7 @@ namespace SnapExit.Services
         public void StopExecution()
         {
             _cancellationTokenSource.Cancel();
+            throw new Exception();
         }
     }
 }

@@ -31,7 +31,8 @@ namespace SnapExit.Benchmark
         public async Task SnapExit()
         {
             _service.StopExecution();
-            await Task.Delay(5000);
+            await Task.Delay(1000);
+            await Task.Delay(1000);
         }
     }
 

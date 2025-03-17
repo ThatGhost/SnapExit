@@ -17,33 +17,33 @@ namespace SnapExit
 
         public async Task Invoke(HttpContext context, ExecutionControlService excecutionControlService, IResponseBodySerializer serializer)
         {
-            var token = excecutionControlService.GetToken();
+            var cts = excecutionControlService.GetTokenSource();
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
 
+            // Setup task race
+            using var tokenTask = Task.Delay(Timeout.Infinite, linkedCts.Token);
+            var task = _next(context);
             try
             {
-                // Setup task race
-                using var tokenTask = Task.Delay(Timeout.Infinite, token);
-                var task = _next(context);
                 var completedTask = await Task.WhenAny(task, tokenTask);
-
                 if (completedTask == task)
                 {
                     excecutionControlService.StopExecution();
                     return;
                 }
-
-                // Early ckecks
-                var responseData = excecutionControlService.GetResponseData();
-                if (!token.IsCancellationRequested) return;
-                if (context.Response.HasStarted) return;
-
-                // write response 
-                await WriteResponse(context, serializer, excecutionControlService);
             }
             catch (Exception)
             {
-                throw;
+                if (!tokenTask.IsCanceled) throw;
             }
+
+            // Early ckecks
+            var responseData = excecutionControlService.GetResponseData();
+            if (!linkedCts.Token.IsCancellationRequested) return;
+            if (context.Response.HasStarted) return;
+
+            // write response 
+            await WriteResponse(context, serializer, excecutionControlService);
         }
 
         private async Task WriteResponse(HttpContext context, IResponseBodySerializer serializer, ExecutionControlService excecutionControlService)
