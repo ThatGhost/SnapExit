@@ -1,12 +1,13 @@
 
 # Snap exit
+nuget link: [SnapExit](https://www.nuget.org/packages/SnapExit/)
 
-A middleware package that allows for exception like behaviour to validate state in a given ASP.NET Core API project. But with all the performance benifits of cancelation tokens.
+A middleware package that allows for exception-like behavior to validate state in an ASP.NET Core API project, but with all the performance benefits of cancellation tokens.
 
-Any feedback is helpfull. Please leave it in the Issues section
+Any feedback is helpful. Please leave it in the Issues section.
 
 ## Performance
-The package is meant to replace exceptions, but on average still has a 2x performance gain over the default IActionResult.
+The package is meant to replace exceptions but still keeps (or improves) the performance of IActionResult
 
 | Exceptions | IActionResult | SnapExit |
 |------------|---------------|----------|
@@ -14,7 +15,7 @@ The package is meant to replace exceptions, but on average still has a 2x perfor
 
 ## Usage
 
-Register snap exit in your program.cs
+Register SnapExit in your Program.cs
 
 ```csharp
     builder.Services.AddSnapExit(); // registers the services (with options)
@@ -23,7 +24,7 @@ Register snap exit in your program.cs
     app.AddSnapExit(); // registers the middleware
 ```
 
-Inject the execution controll service into your flow and use it like you would an exception;
+Inject the ExecutionControlService into your flow and use it like you would an exception:
 
 ```csharp
   public class YourService {
@@ -44,8 +45,8 @@ Inject the execution controll service into your flow and use it like you would a
   }
 ```
 
-This will halt the flow of the request and immediatly return a response to the client.
-You can also return a specialized response like so (body and headers are optional)
+This halts the flow of the request and immediately returns a response to the client.
+You can also return a specialized response like so (body and headers are optional):
 ```csharp
   _executionControlService.StopExecution(new CustomResponseData() {
       StatusCode = 404,
@@ -55,8 +56,8 @@ You can also return a specialized response like so (body and headers are optiona
 ```
 ## Recommendation
 
-I recommend creating your own service that has specialized reponses based on events.
-for example.
+I recommend creating your own service with specialized responses based on events.
+For example:
 
 ```csharp
 public class ErrorService {
@@ -82,4 +83,4 @@ public class ErrorService {
 }
 ```
 
-If there is need for a default one i might make a template.
+If there is a need for a default implementation, I might create a template.
