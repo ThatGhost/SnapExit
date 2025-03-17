@@ -5,7 +5,12 @@ A nuget package that allows for exception like behaviour to validate state in a 
 
 Any feedback is helpfull. Please leave it in the Issues section
 
+## Performance
+The package is meant to replace exceptions, but on average still has a 2x performance gain over the default IActionResult.
 
+| Exceptions | IActionResult | SnapExit |
+|------------|---------------|----------|
+| 300ms      | 80ms          | 40ms     |
 
 ## Usage
 
