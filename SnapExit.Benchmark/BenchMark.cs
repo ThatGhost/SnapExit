@@ -65,7 +65,7 @@ namespace SnapExit.Benchmark
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            await _client.GetAsync("BenchMark/Exception");
+            var response = await _client.GetAsync("BenchMark/Exception");
 
             stopwatch.Stop();
 
@@ -81,12 +81,13 @@ namespace SnapExit.Benchmark
             stopwatch.Start();
             _logger.LogInformation("HERE");
 
-            await _client.GetAsync("BenchMark/Result");
+            var result = await _client.GetAsync("BenchMark/Result");
 
             stopwatch.Stop();
 
             // Log the timings and counts
             _logger.LogInformation($"Total Execution Time for Exception Test: {stopwatch.ElapsedMilliseconds} ms");
+            Assert.Equal(System.Net.HttpStatusCode.NotFound, result.StatusCode);
         }
     }
 
