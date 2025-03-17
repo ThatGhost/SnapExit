@@ -26,7 +26,7 @@ namespace SnapExit.Benchmark
                 .Configure(app =>
                 {
                     app.UseHttpsRedirection();
-                    app.AddSnapExit();
+                    app.UseSnapExit();
                     app.UseRouting();
                     app.UseAuthorization();
                     app.UseEndpoints(endpoints =>

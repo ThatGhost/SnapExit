@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace SnapExit.Services.Serializers
 {
-    public class JSONResponseBodySerializer : IResponseBodySerializer
+    public sealed class JSONResponseBodySerializer : IResponseBodySerializer
     {
         public string ContentType { get => "application/json"; }
 

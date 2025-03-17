@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace SnapExit.Services.Serializers
 {
-    public class XMLResponseBodySerializer : IResponseBodySerializer
+    public sealed class XMLResponseBodySerializer : IResponseBodySerializer
     {
         public string ContentType { get => "application/xml"; }
 

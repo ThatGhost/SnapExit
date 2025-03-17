@@ -12,7 +12,5 @@ namespace SnapExit.Entities
         public int DefaultStatusCode { get; set; } = 500;
         public object DefaultBody { get; set; } = "Internal Server Error";
         public IDictionary<string, string> DefaultHeaders { get; set; } = new Dictionary<string, string>();
-        public Type ResponseSerializer { get; set; } = typeof(JSONResponseBodySerializer);
-        public Func<object, string>? CustomResponseSerializer { get; set; } = null;
     }
 }

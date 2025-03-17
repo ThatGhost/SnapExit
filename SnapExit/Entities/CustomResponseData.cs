@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SnapExit.Entities
 {
-    public class CustomResponseData
+    public sealed class CustomResponseData
     {
         public required int StatusCode { get; set; }
         public object? Body { get; set; }

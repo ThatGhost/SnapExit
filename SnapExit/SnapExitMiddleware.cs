@@ -2,11 +2,10 @@
 using SnapExit.Entities;
 using SnapExit.Interfaces;
 using SnapExit.Services;
-using System.Text.Json;
 
 namespace SnapExit
 {
-    internal class SnapExitMiddleware
+    internal sealed class SnapExitMiddleware
     {
         private readonly RequestDelegate _next;
 
@@ -15,9 +14,9 @@ namespace SnapExit
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, ExecutionControlService excecutionControlService, IResponseBodySerializer serializer)
+        public async Task Invoke(HttpContext context, ExecutionControlService executionControlService, IResponseBodySerializer serializer)
         {
-            var cts = excecutionControlService.GetTokenSource();
+            var cts = executionControlService.GetTokenSource();
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
 
             // Setup task race
@@ -28,32 +27,32 @@ namespace SnapExit
                 var completedTask = await Task.WhenAny(task, tokenTask);
                 if (completedTask == task)
                 {
-                    excecutionControlService.StopExecution();
+                    executionControlService.StopExecution();
                     return;
                 }
             }
-            catch (Exception)
+            catch (SnapExitException)
             {
                 if (!tokenTask.IsCanceled) throw;
             }
 
             // Early ckecks
-            var responseData = excecutionControlService.GetResponseData();
             if (!linkedCts.Token.IsCancellationRequested) return;
             if (context.Response.HasStarted) return;
 
             // write response 
-            await WriteResponse(context, serializer, excecutionControlService);
+            await WriteResponse(context, serializer, executionControlService);
         }
 
-        private async Task WriteResponse(HttpContext context, IResponseBodySerializer serializer, ExecutionControlService excecutionControlService)
+        private async Task WriteResponse(HttpContext context, IResponseBodySerializer serializer, ExecutionControlService executionControlService)
         {
             // Write response
-            var responseData = excecutionControlService.GetResponseData();
-            if (responseData == null) return;
+            var responseData = executionControlService.ResponseData;
+            if (responseData == null) responseData = executionControlService.DefaultReponse;
+
             context.Response.StatusCode = responseData.StatusCode;
 
-            if (responseData.Headers != null)
+            if (responseData.Headers is not null)
             {
                 foreach (var header in responseData.Headers)
                 {
@@ -61,8 +60,11 @@ namespace SnapExit
                 }
             }
 
-            context.Response.ContentType = serializer.ContentType;
-            await context.Response.WriteAsync(serializer.GetBody(responseData));
+            if(responseData.Body is not null)
+            {
+                context.Response.ContentType = serializer.ContentType;
+                await context.Response.WriteAsync(serializer.GetBody(responseData));
+            }
         }
     }
 }

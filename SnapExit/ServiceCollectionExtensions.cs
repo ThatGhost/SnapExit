@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using SnapExit;
 using SnapExit.Entities;
 using SnapExit.Interfaces;
 using SnapExit.Services;
 using SnapExit.Services.Serializers;
 
-namespace SnapExit
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
@@ -28,7 +29,7 @@ namespace SnapExit
             return services.AddSnapExit<JSONResponseBodySerializer>(options);
         }
 
-        public static void AddSnapExit(this IApplicationBuilder app)
+        public static void UseSnapExit(this IApplicationBuilder app)
         {
             app.UseMiddleware<SnapExitMiddleware>();
         }
