@@ -2,7 +2,7 @@
 # Snap exit
 nuget link: [SnapExit](https://www.nuget.org/packages/SnapExit/)
 
-A middleware package that allows for exception-like behavior to validate state in an ASP.NET Core API project, but with all the performance benefits of cancellation tokens.
+A nuget package that allows for exception-like behavior to validate state in any ASP.NET project, but with all the performance benefits of cancellation tokens.
 
 Any feedback is helpful. Please leave it in the Issues section.
 
@@ -11,17 +11,14 @@ The package is meant to replace exceptions but still keeps (or improves) the per
 
 | Exceptions | IActionResult | SnapExit |
 |------------|---------------|----------|
-| 300ms      | 80ms          | 40ms     |
+| 200-300ms  | 60-70ms       | 20-30ms  |
 
 ## Usage
 
 Register SnapExit in your Program.cs
 
 ```csharp
-    builder.Services.AddSnapExit(); // registers the services (with options)
-
-    var app = builder.Build();
-    app.AddSnapExit(); // registers the middleware
+    builder.Services.AddSnapExit(); // registers the services (with options to add enviroument variables)
 ```
 
 Inject the ExecutionControlService into your flow and use it like you would an exception:
@@ -45,8 +42,7 @@ Inject the ExecutionControlService into your flow and use it like you would an e
   }
 ```
 
-This halts the flow of the request and immediately returns a response to the client.
-You can also return a specialized response like so (body and headers are optional):
+This halts the flow of task immediatly, you can even return custom defined data to the return point:
 ```csharp
   _executionControlService.StopExecution(new CustomResponseData() {
       StatusCode = 404,
@@ -54,6 +50,25 @@ You can also return a specialized response like so (body and headers are optiona
       Headers = new IDictionary<string, string>{ { "Authentication":"123abc456def" } }
   });
 ```
+
+To make this work you will need to define a return point for SnapExit. This is made easy by using the SnapExitManager base class!
+```csharp
+  public class SnapExitReturnPoint : SnapExitManager
+  {
+      public void ThisCanBeAnyPointOfCode() {
+          SnapReaction = OnSnapExit;
+          Task task = SomeLongTask();
+          RegisterSnapExit(task, _executionControlService); // you will need to inject the executionControlService
+      }
+
+      private Task OnSnapExit(object stateData, object enviroumentData) {
+          // Do some code here related to an exit
+      }
+  }
+```
+
+Also look at the example to see how you can turn it into a middleware for ASP.NET Core api!
+
 ## Recommendation
 
 I recommend creating your own service with specialized responses based on events.
