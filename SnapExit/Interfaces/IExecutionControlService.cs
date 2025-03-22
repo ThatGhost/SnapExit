@@ -10,12 +10,14 @@ namespace SnapExit.Interfaces
         /// </summary>
         /// <param name="customResponseData">the response to send to the client</param>
         [DoesNotReturn]
-        public void StopExecution(CustomResponseData customResponseData);
+        public void StopExecution(object customResponseData);
 
         /// <summary>
         /// Stops the current request execution and returns the default response to the client
         /// </summary>
         [DoesNotReturn]
         public void StopExecution();
+
+        public CancellationTokenSource GetTokenSource();
     }
 }

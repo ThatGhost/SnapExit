@@ -1,4 +1,4 @@
-﻿using SnapExit.Entities;
+﻿using SnapExit.Example.Entities;
 using SnapExit.Example.Services.Interfaces;
 using SnapExit.Interfaces;
 

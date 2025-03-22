@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SnapExit.Example.Entities;
 using SnapExit.Interfaces;
 using SnapExit.Services;
 
-namespace SnapExit.Benchmark
+namespace SnapExit.Benchmark.Controller
 {
     [ApiController]
     [Route("[controller]")]
@@ -30,7 +31,14 @@ namespace SnapExit.Benchmark
         [HttpGet("SnapExit")]
         public async Task SnapExit()
         {
-            _service.StopExecution();
+            _service.StopExecution(new CustomResponseData()
+            {
+                Body = new
+                {
+                    Message = "Wowzer"
+                },
+                StatusCode = 500
+            });
             await Task.Delay(1000);
             await Task.Delay(1000);
         }

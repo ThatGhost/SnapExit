@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
+using SnapExit.Example;
 
 namespace SnapExit.Benchmark
 {
@@ -21,13 +22,13 @@ namespace SnapExit.Benchmark
                 {
                     services.AddLogging(configure => configure.AddConsole());
                     services.AddControllers();
-                    services.AddSnapExit();
+                    services.AddSnapExit<SnapExitReponse>();
                 })
                 .Configure(app =>
                 {
                     app.UseHttpsRedirection();
-                    app.UseSnapExit();
                     app.UseRouting();
+                    app.UseMiddleware<SnapExitMiddleware>();
                     app.UseAuthorization();
                     app.UseEndpoints(endpoints =>
                     {
