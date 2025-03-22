@@ -30,7 +30,7 @@ namespace SnapExit.Example
             }
 
             app.UseHttpsRedirection();
-            app.AddSnapExit();
+            app.UseSnapExit();
             app.UseAuthorization();
 
 
