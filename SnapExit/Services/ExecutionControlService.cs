@@ -8,20 +8,15 @@ namespace SnapExit.Services
     public sealed class ExecutionControlService : IExecutionControlService
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new();
-        internal CustomResponseData? ResponseData { get; private set; }
+        internal object? ResponseData { get; private set; }
 
-        internal CancellationTokenSource GetTokenSource() => _cancellationTokenSource;
+        public CancellationTokenSource GetTokenSource() => _cancellationTokenSource;
 
-        public CustomResponseData DefaultReponse { get; }
+        public object EnviroumentData { get; set; }
 
-        public ExecutionControlService(IOptions<SnapExitOptions> options)
+        public ExecutionControlService(IOptions<object> options)
         {
-            DefaultReponse = new CustomResponseData
-            {
-                StatusCode = options.Value.DefaultStatusCode,
-                Body = options.Value.DefaultBody,
-                Headers = options.Value.DefaultHeaders
-            };
+            EnviroumentData = options.Value ?? new { };
         }
 
         /// <summary>
@@ -29,7 +24,7 @@ namespace SnapExit.Services
         /// </summary>
         /// <param name="customResponseData">the response to send to the client</param>
         [DoesNotReturn]
-        public void StopExecution(CustomResponseData customResponseData)
+        public void StopExecution(object customResponseData)
         {
             ResponseData = customResponseData;
             StopExecution();

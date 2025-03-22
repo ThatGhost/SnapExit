@@ -1,3 +1,4 @@
+using SnapExit.Example.Entities;
 using SnapExit.Example.Services;
 using SnapExit.Example.Services.Interfaces;
 
@@ -15,7 +16,7 @@ namespace SnapExit.Example
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddSnapExit();
+            builder.Services.AddSnapExit<CustomResponseData>();
 
             builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();
             builder.Services.AddScoped<IAssertionService, AssertionService>();
@@ -30,11 +31,9 @@ namespace SnapExit.Example
             }
 
             app.UseHttpsRedirection();
-            app.UseSnapExit();
             app.UseAuthorization();
-
-
             app.MapControllers();
+            app.UseMiddleware<SnapExitMiddleware>();
 
             app.Run();
         }
