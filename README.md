@@ -11,7 +11,7 @@ The package is meant to replace exceptions but still keeps (or improves) the per
 
 | Exceptions | IActionResult | SnapExit |
 |------------|---------------|----------|
-| 200-300ms  | 60-70ms       | 20-30ms  |
+| 200-230ms  | 60ms          | 20ms     |
 
 ## Usage
 
