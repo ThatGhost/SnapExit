@@ -14,11 +14,6 @@ namespace SnapExit.Services
 
         public object EnviroumentData { get; set; }
 
-        public ExecutionControlService(IOptions<object> options)
-        {
-            EnviroumentData = options.Value ?? new { };
-        }
-
         /// <summary>
         /// Stops the current request execution and returns the provided response to the client
         /// </summary>

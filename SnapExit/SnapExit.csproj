@@ -12,7 +12,7 @@
     <Description>Do you hate result objects? but exceptions are too slow? Try this!!</Description>
     <PackageProjectUrl>https://www.nuget.org/packages/SnapExit/</PackageProjectUrl>
     <PackageIcon>snapexit.png</PackageIcon>
-    <Version>2.0.1</Version>
+    <Version>2.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

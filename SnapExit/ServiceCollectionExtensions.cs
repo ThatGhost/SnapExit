@@ -6,14 +6,9 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSnapExit<T>(this IServiceCollection services, Action<SnapExitOptions<T>>? options = null)
+        public static IServiceCollection AddSnapExit<T>(this IServiceCollection services)
             where T : class
         {
-            services.Configure<SnapExitOptions<T>>(configoptions =>
-            {
-                options?.Invoke(configoptions);
-            });
-
             services.AddScoped<IExecutionControlService, ExecutionControlService>();
             services.AddScoped<ExecutionControlService>(provider => (ExecutionControlService)provider.GetRequiredService<IExecutionControlService>());
             return services;

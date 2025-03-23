@@ -19,8 +19,7 @@ namespace SnapExit.Example
             var cts = executionControlService.GetTokenSource();
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
 
-            // SnapExit specific setup
-            SnapReaction = OnSnapExit;
+            // SnapExit specific setup for middleware
             executionControlService.EnviroumentData = context;
 
             // get the task of the request
@@ -31,9 +30,9 @@ namespace SnapExit.Example
             return Task.CompletedTask;
         }
 
-        private async Task OnSnapExit(object stateData, object enviroumentData)
+        protected override async Task SnapExitResponse(object? ResponseData, object? enviroumentData)
         {
-            var response = stateData as CustomResponseData;
+            var response = ResponseData as CustomResponseData;
             if (response is null) throw new Exception("Something went wrong with state");
             var context = enviroumentData as HttpContext;
             if (context is null) throw new Exception("Something went wrong with enviroument");
@@ -44,7 +43,8 @@ namespace SnapExit.Example
 
             if (response.Headers is not null)
             {
-                foreach (var header in response.Headers) {
+                foreach (var header in response.Headers)
+                {
                     context.Response.Headers[header.Key] = header.Value;
                 }
             }

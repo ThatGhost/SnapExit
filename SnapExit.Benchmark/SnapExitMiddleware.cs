@@ -21,7 +21,6 @@ namespace SnapExit.Benchmark
             using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
 
             // SnapExit specific setup
-            SnapReaction = OnSnapExit;
             executionControlService.EnviroumentData = context;
 
             // get the task of the request
@@ -32,7 +31,7 @@ namespace SnapExit.Benchmark
             return Task.CompletedTask;
         }
 
-        private async Task OnSnapExit(object stateData, object enviroumentData)
+        protected override async Task SnapExitResponse(object? stateData, object? enviroumentData)
         {
             var response = stateData as CustomResponseData;
             if (response is null) throw new Exception("Something went wrong with state");

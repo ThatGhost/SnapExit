@@ -10,20 +10,27 @@ namespace SnapExit.Services
 {
     public class SnapExitManager
     {
-        protected Func<object, object, Task>? SnapReaction = null;
+        protected delegate Task OnSnapExit(object? responseData, object? enviroumentData);
+        protected OnSnapExit onSnapExit;
 
-        public async void RegisterSnapAction(Task task, ExecutionControlService executionControlService)
+        private ExecutionControlService? _executionControlService { get; set; }
+
+        protected SnapExitManager() {
+            onSnapExit += SnapExitResponse;
+        }
+        protected SnapExitManager(ExecutionControlService executionControlService)
         {
-            if (SnapReaction is null) throw new Exception("You must register the SnapReaction field");
+            _executionControlService = executionControlService;
+            onSnapExit += SnapExitResponse;
+        }
 
-            var cts = executionControlService.GetTokenSource();
-
-            // Setup task race
-            using Task tokenTask = Task.Delay(Timeout.Infinite, cts.Token);
+        private async void DoRace(Task task, CancellationToken token, ExecutionControlService executionControlService)
+        {
+            using Task tokenTask = Task.Delay(Timeout.Infinite, token);
             try
             {
                 var completedTask = await Task.WhenAny(task, tokenTask);
-                if (completedTask == task)
+                if (completedTask == task && !token.IsCancellationRequested)
                 {
                     executionControlService.StopExecution();
                     return;
@@ -34,31 +41,44 @@ namespace SnapExit.Services
                 if (!tokenTask.IsCanceled) throw;
             }
 
-            await SnapReaction.Invoke(executionControlService.ResponseData ?? new { }, executionControlService.EnviroumentData);
+            if(onSnapExit is not null)
+            await onSnapExit.Invoke(executionControlService.ResponseData, executionControlService.EnviroumentData);
         }
 
-        public async void RegisterSnapExit(Task task, CancellationToken linkedToken, ExecutionControlService executionControlService)
+        /// <summary>
+        /// This registers that the current task is supposed to use snapExit. 
+        /// </summary>
+        /// <param name="task">The Task that uses SnapExit</param>
+        /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
+        /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
+        public void RegisterSnapAction(Task task, ExecutionControlService? executionControlService = null)
         {
-            if (SnapReaction is null) throw new Exception("You must register the SnapReaction field");
+            if (_executionControlService is null)
+                _executionControlService = executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"); ;                
 
-            // Setup task race
-            using Task tokenTask = Task.Delay(Timeout.Infinite, linkedToken);
-            try
-            {
-                var completedTask = await Task.WhenAny(task, tokenTask);
-                if (completedTask == task)
-                {
-                    executionControlService.StopExecution();
-                    return;
-                }
-            }
-            catch (SnapExitException)
-            {
-                if (!tokenTask.IsCanceled) throw;
-            }
+            var cts = _executionControlService.GetTokenSource();
 
-            await SnapReaction.Invoke(executionControlService.ResponseData ?? new { }, executionControlService.EnviroumentData);
+            DoRace(task, cts.Token, _executionControlService);
         }
 
+        /// <summary>
+        /// This registers that the current task is supposed to use snapExit. 
+        /// </summary>
+        /// <param name="task">The Task that uses SnapExit</param>
+        /// <param name="linkedToken">A token already in use by your program</param>
+        /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
+        /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
+        public void RegisterSnapExit(Task task, CancellationToken linkedToken, ExecutionControlService? executionControlService = null)
+        {
+            if (_executionControlService is null)
+                _executionControlService = executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"); ;
+
+            DoRace(task, linkedToken, _executionControlService);
+        }
+
+        protected virtual Task SnapExitResponse(object? ResponseData, object? enviroumentData)
+        {
+            return Task.CompletedTask;
+        }
     }
 }

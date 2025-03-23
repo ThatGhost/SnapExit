@@ -31,13 +31,14 @@ namespace SnapExit.Benchmark.Controller
         [HttpGet("SnapExit")]
         public async Task SnapExit()
         {
+            // Example of a response
             _service.StopExecution(new CustomResponseData()
             {
                 Body = new
                 {
                     Message = "Wowzer"
                 },
-                StatusCode = 500
+                StatusCode = 404
             });
             await Task.Delay(1000);
             await Task.Delay(1000);

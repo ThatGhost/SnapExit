@@ -56,7 +56,7 @@ namespace SnapExit.Benchmark
 
             // Log the timings and counts
             _logger.LogInformation($"Total Execution Time for Exception Test: {stopwatch.ElapsedMilliseconds} ms");
-            Assert.Equal(System.Net.HttpStatusCode.InternalServerError, response.StatusCode);
+            Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
