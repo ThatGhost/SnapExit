@@ -27,7 +27,7 @@ namespace SnapExit.Benchmark
             var task = _next(context);
 
             // now SnapExit flings into action
-            RegisterSnapExit(task, linkedCts.Token, executionControlService);
+            RegisterSnapExit(task, linkedCts, executionControlService);
             return Task.CompletedTask;
         }
 
