@@ -56,9 +56,9 @@ To make this work you will need to define a return point for SnapExit. This is m
   public class SnapExitReturnPoint : SnapExitManager
   {
       public void ThisCanBeAnyPointOfCode() {
-          SnapReaction = OnSnapExit;
+          onSnapExit += OnSnapExit; // register the callback function
           Task task = SomeLongTask();
-          RegisterSnapExit(task, _executionControlService); // you will need to inject the executionControlService
+          RegisterSnapExit(task);
       }
 
       private Task OnSnapExit(object stateData, object enviroumentData) {
