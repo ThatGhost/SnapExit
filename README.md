@@ -18,7 +18,7 @@ The package is meant to replace exceptions but still keeps (or improves) the per
 Register SnapExit in your Program.cs
 
 ```csharp
-    builder.Services.AddSnapExit(); // registers the services (with options to add enviroument variables)
+    builder.Services.AddSnapExit(); // registers the services
 ```
 
 Inject the ExecutionControlService into your flow and use it like you would an exception:
@@ -44,10 +44,8 @@ Inject the ExecutionControlService into your flow and use it like you would an e
 
 This halts the flow of task immediatly, you can even return custom defined data to the return point:
 ```csharp
-  _executionControlService.StopExecution(new CustomResponseData() {
-      StatusCode = 404,
-      Body = new { message = "Not found" },
-      Headers = new IDictionary<string, string>{ { "Authentication":"123abc456def" } }
+  _executionControlService.StopExecution(new {
+      // any data can be passed here
   });
 ```
 
@@ -81,16 +79,15 @@ public class ErrorService {
         _executionControlService = executionControlService;
     }
 
-    public void NotFound(string message) {
-        _executionControlService.StopExecution(new CustomResponseData() {
-            StatusCode = 404,
-            Body = new { message = message }
+    public void Foo(string message) {
+        _executionControlService.StopExecution(new {
+            message
         });
     }
 
-    public void Unauthorized() {
-        _executionControlService.StopExecution(new CustomResponseData() {
-            StatusCode = 401,
+    public void Bar() {
+        _executionControlService.StopExecution(new {
+            message = "Something went wrong!"
         });
     }
 
