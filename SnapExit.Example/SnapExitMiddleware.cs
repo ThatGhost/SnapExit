@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace SnapExit.Example;
 
-public sealed class SnapExitMiddleware : SnapExitManager
+public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, HttpContext>
 {
     private readonly RequestDelegate _next;
 
@@ -30,11 +30,11 @@ public sealed class SnapExitMiddleware : SnapExitManager
         return Task.CompletedTask;
     }
 
-    protected override async Task SnapExitResponse(object? responseData, object? enviroumentData)
+    protected override async Task SnapExitResponse(CustomResponseData? response, HttpContext? context)
     {
-        if (responseData is not CustomResponseData response)
+        if (response is null)
             throw new Exception("Something went wrong with state");
-        if (enviroumentData is not HttpContext context)
+        if (context is null)
             throw new Exception("Something went wrong with enviroument");
 
         if (context.Response.HasStarted) return;

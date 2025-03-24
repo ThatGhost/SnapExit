@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace SnapExit.Services;
 
-public class SnapExitManager
+public class SnapExitManager<TResponse,TEnviroument>
 {
-    protected delegate Task OnSnapExit(object? responseData, object? enviroumentData);
+    protected delegate Task OnSnapExit(TResponse? responseData, TEnviroument? enviroumentData);
     protected OnSnapExit onSnapExit;
 
     private ExecutionControlService? _executionControlService { get; set; }
@@ -39,12 +39,12 @@ public class SnapExitManager
             else
             {
                 if (onSnapExit is not null)
-                    await onSnapExit.Invoke(executionControlService.ResponseData, executionControlService.EnviroumentData);
+                    await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
             }
         }
         catch (SnapExitException)
         {
-            if (!tokenTask.IsCanceled) throw;
+            if (!tokenTask.IsCanceled) return;
         }
     }
 
@@ -80,7 +80,7 @@ public class SnapExitManager
         linkedToken.Cancel();
     }
 
-    protected virtual Task SnapExitResponse(object? ResponseData, object? enviroumentData)
+    protected virtual Task SnapExitResponse(TResponse? ResponseData, TEnviroument? enviroumentData)
     {
         return Task.CompletedTask;
     }
