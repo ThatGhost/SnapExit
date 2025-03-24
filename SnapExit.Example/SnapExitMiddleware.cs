@@ -16,14 +16,14 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
     public Task Invoke(HttpContext context, ExecutionControlService executionControlService)
     {
         // Create a linked token for ASP.NET Core API to work
-        var cts = executionControlService.GetTokenSource();
+        var cts = new CancellationTokenSource();
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
 
         // SnapExit specific setup for middleware
         executionControlService.EnviroumentData = context;
 
         // now SnapExit flings into action
-        RegisterSnapExit(() => _next(context), linkedCts, executionControlService);
+        RegisterSnapExit(_next(context), linkedCts, executionControlService);
         return Task.CompletedTask;
     }
 
@@ -48,7 +48,6 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
 
         if (response.Body is not null)
         {
-            context.Response.ContentType = "application/json";
             await context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(response.Body));
         }
     }

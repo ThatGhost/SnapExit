@@ -1,5 +1,4 @@
-﻿using SnapExit.Entities;
-using SnapExit.Interfaces;
+﻿using SnapExit.Interfaces;
 using SnapExit.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;

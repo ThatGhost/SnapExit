@@ -25,7 +25,7 @@ namespace SnapExit.Tests.Services
         public async Task SetupSnapExit(SnapExitReponse response)
         {
             _executionControlService.EnviroumentData = new { };
-            await RegisterSnapActionAsync(() => SomeLongTask(response));
+            RegisterSnapAction(SomeLongTask(response));
         }
 
         private Task SomeLongTask(SnapExitReponse response)

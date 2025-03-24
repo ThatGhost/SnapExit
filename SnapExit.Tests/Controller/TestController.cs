@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SnapExit.Example.Entities;
-using SnapExit.Interfaces;
 using SnapExit.Services;
 
 namespace SnapExit.Benchmark.Controller;

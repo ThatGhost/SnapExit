@@ -1,5 +1,4 @@
-﻿using SnapExit.Entities;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace SnapExit.Interfaces;
 

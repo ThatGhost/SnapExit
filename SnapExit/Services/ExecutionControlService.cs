@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using SnapExit.Entities;
-using SnapExit.Interfaces;
+﻿using SnapExit.Interfaces;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SnapExit.Services;
@@ -12,7 +10,9 @@ public sealed class ExecutionControlService : IExecutionControlService
 
     public CancellationTokenSource GetTokenSource() => _cancellationTokenSource;
 
-    public object EnviroumentData { get; set; }
+#pragma warning disable CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
+    public object? EnviroumentData { get; set; }
+#pragma warning restore CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
 
     /// <summary>
     /// Stops the current request execution and returns the provided response to the client
@@ -29,9 +29,9 @@ public sealed class ExecutionControlService : IExecutionControlService
     /// Stops the current request execution and returns the default response to the client
     /// </summary>
     [DoesNotReturn]
-    public void StopExecution()
+    public async void StopExecution()
     {
         _cancellationTokenSource.Cancel();
-        throw new SnapExitException();
+        await Task.Delay(-1);
     }
 }
