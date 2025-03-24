@@ -47,13 +47,23 @@ public class MiddlewareIntegrationTests
     }
 
     [Fact]
-    public async Task Middleware_Should_Snap_Exit()
+    public async Task Middleware_Should_SnapExit()
     {
         // Arrange & Act
         var response = await _client.GetAsync("Test/SnapExit");
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Middleware_Should_Not_SnapExit()
+    {
+        // Arrange & Act
+        var response = await _client.GetAsync("Test/SnapExit/succes");
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]

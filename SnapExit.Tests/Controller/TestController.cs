@@ -39,6 +39,12 @@ public class TestController : ControllerBase
             },
             StatusCode = 403
         });
-        await Task.Delay(10000); // makes sure the next line is not done
+        throw new Exception("this better not be thrown");
+    }
+
+    [HttpGet("SnapExit/succes")]
+    public Task SnapExitNoProblems()
+    {
+        return Task.CompletedTask;
     }
 }

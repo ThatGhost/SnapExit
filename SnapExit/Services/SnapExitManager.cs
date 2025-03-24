@@ -24,17 +24,20 @@ public class SnapExitManager<TResponse,TEnviroument>
         onSnapExit += SnapExitResponse;
     }
 
-    private async Task DoTaskRace(Task taskFunction, ExecutionControlService executionControlService, CancellationTokenSource? linkedToken = null)
+    private async Task DoTaskRace(Task task, ExecutionControlService executionControlService, CancellationTokenSource? linkedToken = null)
     {
-        var token = linkedToken?.Token ?? executionControlService.GetTokenSource().Token;
-        Task originalTask = new Task(async () => await taskFunction, token);
-        using Task cancelTask = Task.Delay(Timeout.Infinite, executionControlService.GetTokenSource().Token);
+        var exTokenSource = executionControlService.GetTokenSource();
 
-        var completedTask = await Task.WhenAny(originalTask, cancelTask);
+        var token = linkedToken?.Token ?? exTokenSource.Token;
+        
+        Task originalTask = new Task(async () => await task, token);
+        using Task cancelTask = Task.Delay(Timeout.Infinite, exTokenSource.Token);
+
+        var completedTask = await Task.WhenAny(originalTask, cancelTask).ConfigureAwait(false);
 
         if (completedTask == originalTask && !token.IsCancellationRequested)
         {
-            executionControlService.GetTokenSource().Cancel();
+            exTokenSource.Cancel();
             return;
         }
         else
@@ -42,6 +45,7 @@ public class SnapExitManager<TResponse,TEnviroument>
             if (onSnapExit is not null)
                 await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
             if(linkedToken is not null && linkedToken.Token.CanBeCanceled) linkedToken.Cancel();
+            if(exTokenSource.Token.CanBeCanceled) exTokenSource.Cancel();
         }
     }
 
