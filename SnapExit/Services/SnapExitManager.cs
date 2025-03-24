@@ -39,7 +39,7 @@ public class SnapExitManager
             else
             {
                 if (onSnapExit is not null)
-                    await onSnapExit.Invoke(executionControlService.ResponseData, executionControlService.EnviromentData);
+                    await onSnapExit.Invoke(executionControlService.ResponseData, executionControlService.EnviroumentData);
             }
         }
         catch (SnapExitException)
@@ -72,8 +72,9 @@ public class SnapExitManager
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async void RegisterSnapExit(Task task, CancellationTokenSource linkedToken, ExecutionControlService? executionControlService = null)
     {
+        _executionControlService ??= executionControlService;
         if (_executionControlService is null)
-            _executionControlService = executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"); ;
+            throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"); ;
 
         await DoTaskRace(task, _executionControlService);
         linkedToken.Cancel();

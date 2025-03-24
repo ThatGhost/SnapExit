@@ -3,7 +3,7 @@ using System;
 
 namespace SnapExit.Example.Services;
 
-public class WeatherForecastService : IWeatherForecastService
+public sealed class WeatherForecastService : IWeatherForecastService
 {
     private static readonly string[] Summaries = new[]
     {

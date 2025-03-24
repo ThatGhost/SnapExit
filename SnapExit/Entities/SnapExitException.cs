@@ -7,4 +7,4 @@ using System.Threading.Tasks;
 namespace SnapExit.Entities;
 
 // Causes minimal performance loss because it gets thrown in a cancelled Task
-class SnapExitException : Exception;
+internal sealed class SnapExitException : Exception;

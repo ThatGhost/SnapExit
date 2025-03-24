@@ -4,7 +4,7 @@ using SnapExit.Interfaces;
 
 namespace SnapExit.Example.Services;
 
-public class AssertionService : IAssertionService
+public sealed class AssertionService : IAssertionService
 {
     private readonly IExecutionControlService executionControlService;
 

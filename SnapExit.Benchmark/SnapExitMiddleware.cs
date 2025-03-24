@@ -21,7 +21,7 @@ public sealed class SnapExitMiddleware : SnapExitManager
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
 
         // SnapExit specific setup
-        executionControlService.EnviromentData = context;
+        executionControlService.EnviroumentData = context;
 
         // get the task of the request
         var task = _next(context);
@@ -31,12 +31,12 @@ public sealed class SnapExitMiddleware : SnapExitManager
         return Task.CompletedTask;
     }
 
-    protected override async Task SnapExitResponse(object? stateData, object? enviroumentData)
+    protected override async Task SnapExitResponse(object? responseData, object? enviroumentData)
     {
-        var response = stateData as CustomResponseData;
-        if (response is null) throw new Exception("Something went wrong with state");
-        var context = enviroumentData as HttpContext;
-        if (context is null) throw new Exception("Something went wrong with enviroument");
+        if (responseData is not CustomResponseData response) 
+            throw new Exception("Something went wrong with state");
+        if (enviroumentData is not HttpContext context)
+            throw new Exception("Something went wrong with enviroument");
 
         if (context.Response.HasStarted) return;
 

@@ -1,6 +1,6 @@
 ﻿namespace SnapExit.Example.Entities;
 
-public class CustomResponseData
+public sealed class CustomResponseData
 {
     public int StatusCode { get; set; }
     public object? Body { get; set; }

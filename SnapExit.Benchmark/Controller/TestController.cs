@@ -7,11 +7,11 @@ namespace SnapExit.Benchmark.Controller;
 
 [ApiController]
 [Route("[controller]")]
-public class BenchMarkController : ControllerBase
+public class TestController : ControllerBase
 {
     private readonly ExecutionControlService _service;
 
-    public BenchMarkController(ExecutionControlService service)
+    public TestController(ExecutionControlService service)
     {
         _service = service;
     }

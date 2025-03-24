@@ -1,3 +1,3 @@
 ﻿namespace SnapExit.Benchmark;
 
-class SnapExitReponse;
+public sealed class SnapExitReponse;

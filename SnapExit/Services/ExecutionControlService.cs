@@ -12,7 +12,7 @@ public sealed class ExecutionControlService : IExecutionControlService
 
     public CancellationTokenSource GetTokenSource() => _cancellationTokenSource;
 
-    public object EnviromentData { get; set; }
+    public object EnviroumentData { get; set; }
 
     /// <summary>
     /// Stops the current request execution and returns the provided response to the client
