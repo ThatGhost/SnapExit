@@ -32,8 +32,8 @@ Inject the ExecutionControlService into your flow and use it like you would an e
       }
 
       // New way
-      public Task ThisShouldThrow() {
-          _executionControlService.StopExecution();
+      public async Task ThisShouldThrow() {
+          await _executionControlService.StopExecution();
       }
 
       // Old way
@@ -80,14 +80,14 @@ public class ErrorService {
         _executionControlService = executionControlService;
     }
 
-    public void Foo(string message) {
-        _executionControlService.StopExecution(new {
+    public Task Foo(string message) {
+        return _executionControlService.StopExecution(new {
             message
         });
     }
 
-    public void Bar() {
-        _executionControlService.StopExecution(new {
+    public Task Bar() {
+        return _executionControlService.StopExecution(new {
             message = "Something went wrong!"
         });
     }

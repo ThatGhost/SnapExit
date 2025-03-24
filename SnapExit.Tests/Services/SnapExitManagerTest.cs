@@ -22,10 +22,10 @@ namespace SnapExit.Tests.Services
             _executionControlService = executionControlService;
         }
 
-        public async Task SetupSnapExit(SnapExitReponse response)
+        public void SetupSnapExit(SnapExitReponse response)
         {
             _executionControlService.EnviroumentData = new { };
-            RegisterSnapAction(SomeLongTask(response));
+            RegisterSnapExit(SomeLongTask(response));
         }
 
         private Task SomeLongTask(SnapExitReponse response)

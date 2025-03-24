@@ -31,13 +31,13 @@ public class TestController : ControllerBase
     public async Task SnapExit()
     {
         // Example of a response
-        _service.StopExecution(new CustomResponseData()
+        await _service.StopExecution(new CustomResponseData()
         {
             Body = new
             {
                 Message = "Wowzer"
             },
-            StatusCode = 404
+            StatusCode = 403
         });
         await Task.Delay(10000); // makes sure the next line is not done
     }

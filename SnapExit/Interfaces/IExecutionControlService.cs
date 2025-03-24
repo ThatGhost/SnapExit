@@ -11,13 +11,13 @@ public interface IExecutionControlService
     /// </summary>
     /// <param name="customResponseData">the response to send to the client</param>
     [DoesNotReturn]
-    public void StopExecution(object customResponseData);
+    public Task StopExecution(object customResponseData);
 
     /// <summary>
     /// Stops the current request execution and returns the default response to the client
     /// </summary>
     [DoesNotReturn]
-    public void StopExecution();
+    public Task StopExecution();
 
     public CancellationTokenSource GetTokenSource();
 }

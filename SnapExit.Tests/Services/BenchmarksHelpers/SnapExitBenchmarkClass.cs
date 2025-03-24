@@ -17,7 +17,7 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
         int rnd = random.Next();
         Task newTask = new Task(() => { rnd++; executionControlService.StopExecution(); Task.Delay(10000); });
         await newTask;
-        RegisterSnapAction(newTask);
+        RegisterSnapExit(newTask);
         return rnd;
     }
 
@@ -25,7 +25,7 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
     {
         int rnd = random.Next();
         Task newTask = new Task(() => { rnd++; executionControlService.StopExecution(); Task.Delay(10000); });
-        RegisterSnapAction(newTask);
+        RegisterSnapExit(newTask);
         await newTask;
         return rnd;
     }

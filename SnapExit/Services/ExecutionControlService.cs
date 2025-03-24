@@ -19,19 +19,21 @@ public sealed class ExecutionControlService : IExecutionControlService
     /// </summary>
     /// <param name="customResponseData">the response to send to the client</param>
     [DoesNotReturn]
-    public void StopExecution(object customResponseData)
+    public Task StopExecution(object customResponseData)
     {
         ResponseData = customResponseData;
-        StopExecution();
+        return StopExecution();
     }
 
     /// <summary>
     /// Stops the current request execution and returns the default response to the client
     /// </summary>
     [DoesNotReturn]
-    public async void StopExecution()
+    public async Task StopExecution()
+#pragma warning disable CS8763 // A method marked [DoesNotReturn] should not return.
     {
         _cancellationTokenSource.Cancel();
-        await Task.Delay(-1);
+        await Task.Delay(Timeout.Infinite);
     }
+#pragma warning restore CS8763 // A method marked [DoesNotReturn] should not return.
 }

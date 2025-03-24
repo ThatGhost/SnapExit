@@ -50,10 +50,10 @@ public class MiddlewareIntegrationTests
     public async Task Middleware_Should_Snap_Exit()
     {
         // Arrange & Act
-        var response = await _client.GetAsync("BenchMark/SnapExit");
+        var response = await _client.GetAsync("Test/SnapExit");
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class MiddlewareIntegrationTests
         SnapExitReponse reponse = new SnapExitReponse() { Message = "This is a message that has passed" };
 
         // Act
-        await testService.SetupSnapExit(reponse);
+        testService.SetupSnapExit(reponse);
 
         // Assert
         Assert.Equal(reponse, testService.response);
