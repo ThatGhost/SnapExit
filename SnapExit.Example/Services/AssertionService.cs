@@ -2,42 +2,41 @@
 using SnapExit.Example.Services.Interfaces;
 using SnapExit.Interfaces;
 
-namespace SnapExit.Example.Services
+namespace SnapExit.Example.Services;
+
+public class AssertionService : IAssertionService
 {
-    public class AssertionService : IAssertionService
+    private readonly IExecutionControlService executionControlService;
+
+    public AssertionService(IExecutionControlService executionControlService)
     {
-        private readonly IExecutionControlService executionControlService;
+        this.executionControlService = executionControlService;
+    }
 
-        public AssertionService(IExecutionControlService executionControlService)
+    public void Forbidden(string message, string token)
+    {
+        executionControlService.StopExecution(new CustomResponseData()
         {
-            this.executionControlService = executionControlService;
-        }
+            StatusCode = 403,
+            Body = new { message },
+            Headers = new Dictionary<string, string>(){ { "Auth", token } }
+        });
+    }
 
-        public void Forbidden(string message, string token)
+    public void NotFound()
+    {
+        executionControlService.StopExecution(new CustomResponseData()
         {
-            executionControlService.StopExecution(new CustomResponseData()
-            {
-                StatusCode = 403,
-                Body = new { message },
-                Headers = new Dictionary<string, string>(){ { "Auth", token } }
-            });
-        }
+            StatusCode = 404,
+        });
+    }
 
-        public void NotFound()
+    public void Teapot(string message)
+    {
+        executionControlService.StopExecution(new CustomResponseData()
         {
-            executionControlService.StopExecution(new CustomResponseData()
-            {
-                StatusCode = 404,
-            });
-        }
-
-        public void Teapot(string message)
-        {
-            executionControlService.StopExecution(new CustomResponseData()
-            {
-                StatusCode = 418,
-                Body = new { message }
-            });
-        }
+            StatusCode = 418,
+            Body = new { message }
+        });
     }
 }

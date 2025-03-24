@@ -5,7 +5,7 @@ VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapExit", "SnapExit\SnapExit.csproj", "{37B626EE-FA79-492B-A7AC-51315B17658B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapExit.Benchmark", "SnapExit.Benchmark\SnapExit.Benchmark.csproj", "{61069852-B65C-4EE2-8CC5-59BC41552FDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapExit.Tests", "SnapExit.Benchmark\SnapExit.Tests.csproj", "{61069852-B65C-4EE2-8CC5-59BC41552FDA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapExit.Example", "SnapExit.Example\SnapExit.Example.csproj", "{50E372A5-739E-4CD6-8E2B-CF47A55C450C}"
 EndProject

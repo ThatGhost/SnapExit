@@ -59,7 +59,7 @@ To make this work you will need to define a return point for SnapExit. This is m
           RegisterSnapExit(task);
       }
 
-      private Task OnSnapExit(object stateData, object enviroumentData) {
+      private Task OnSnapExit(object stateData, object enviromentData) {
           // Do some code here related to an exit
       }
   }

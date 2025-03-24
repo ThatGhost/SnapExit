@@ -2,40 +2,39 @@ using SnapExit.Example.Entities;
 using SnapExit.Example.Services;
 using SnapExit.Example.Services.Interfaces;
 
-namespace SnapExit.Example
+namespace SnapExit.Example;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        var builder = WebApplication.CreateBuilder(args);
+
+        // Add services to the container.
+
+        builder.Services.AddControllers();
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+        builder.Services.AddSnapExit<CustomResponseData>();
+
+        builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();
+        builder.Services.AddScoped<IAssertionService, AssertionService>();
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
         {
-            var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-            builder.Services.AddSnapExit<CustomResponseData>();
-
-            builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();
-            builder.Services.AddScoped<IAssertionService, AssertionService>();
-
-            var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseAuthorization();
-            app.MapControllers();
-            app.UseMiddleware<SnapExitMiddleware>();
-
-            app.Run();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
+
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+        app.MapControllers();
+        app.UseMiddleware<SnapExitMiddleware>();
+
+        app.Run();
     }
 }

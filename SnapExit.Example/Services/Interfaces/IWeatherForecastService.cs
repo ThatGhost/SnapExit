@@ -1,8 +1,7 @@
-﻿namespace SnapExit.Example.Services.Interfaces
+﻿namespace SnapExit.Example.Services.Interfaces;
+
+public interface IWeatherForecastService
 {
-    public interface IWeatherForecastService
-    {
-        public WeatherForecast GetWeatherForecast();
-        public void UpdateWeatherForecast(WeatherForecast weatherForecast);
-    }
+    public WeatherForecast GetWeatherForecast();
+    public void UpdateWeatherForecast(WeatherForecast weatherForecast);
 }

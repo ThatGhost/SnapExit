@@ -1,9 +1,8 @@
-﻿namespace SnapExit.Example.Services.Interfaces
+﻿namespace SnapExit.Example.Services.Interfaces;
+
+public interface IAssertionService
 {
-    public interface IAssertionService
-    {
-        public void NotFound();
-        public void Teapot(string message);
-        public void Forbidden(string message, string token);
-    }
+    public void NotFound();
+    public void Teapot(string message);
+    public void Forbidden(string message, string token);
 }
