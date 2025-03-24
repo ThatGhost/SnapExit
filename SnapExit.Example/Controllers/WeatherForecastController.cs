@@ -5,7 +5,7 @@ namespace SnapExit.Example.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class WeatherForecastController : ControllerBase
+public sealed class WeatherForecastController : ControllerBase
 {
     private readonly IWeatherForecastService _weatherForecastService;
 

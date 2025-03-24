@@ -1,8 +1,9 @@
-﻿using SnapExit.Example.Entities;
+﻿using Microsoft.AspNetCore.Http;
+using SnapExit.Example.Entities;
 using SnapExit.Services;
 using System.Text.Json;
 
-namespace SnapExit.Example;
+namespace SnapExit.Tests.Services;
 
 public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, HttpContext>
 {
@@ -16,10 +17,10 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
     public Task Invoke(HttpContext context, ExecutionControlService executionControlService)
     {
         // Create a linked token for ASP.NET Core API to work
-        var cts = new CancellationTokenSource();
+        var cts = executionControlService.GetTokenSource();
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
 
-        // SnapExit specific setup for middleware
+        // SnapExit specific setup
         executionControlService.EnviroumentData = context;
 
         // now SnapExit flings into action
@@ -40,14 +41,14 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
 
         if (response.Headers is not null)
         {
-            foreach (var header in response.Headers)
-            {
+            foreach (var header in response.Headers) {
                 context.Response.Headers[header.Key] = header.Value;
             }
         }
 
         if (response.Body is not null)
         {
+            context.Response.ContentType = "application/json";
             await context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(response.Body));
         }
     }
