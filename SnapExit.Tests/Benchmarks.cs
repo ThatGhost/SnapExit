@@ -16,21 +16,21 @@ public class Benchmarks
         benchmarkClass = new SnapExitBenchmarkClass(new ExecutionControlService());
     }
 
-    [Benchmark(OperationsPerInvoke = 2048)]
+    [Benchmark(OperationsPerInvoke = 32)]
     public async Task NormalService_SnapExitAsync()
     {
         int rnd = await benchmarkClass.DoSnapExit();
         DeadCodeEliminationHelper.KeepAliveWithoutBoxing(rnd);
     }
 
-    [Benchmark(OperationsPerInvoke = 2048)]
+    [Benchmark(OperationsPerInvoke = 32)]
     public async Task NormalService_SnapExitAfterRegisterAsync()
     {
         int rnd = await benchmarkClass.DoSnapExitAfterRegister();
         DeadCodeEliminationHelper.KeepAliveWithoutBoxing(rnd);
     }
 
-    [Benchmark(OperationsPerInvoke = 2048)]
+    [Benchmark(OperationsPerInvoke = 32)]
     public async Task NormalService_ExceptionsAsync()
     {
         int rnd = await benchmarkClass.DoException();
