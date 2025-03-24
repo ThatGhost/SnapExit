@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Builder;
 using SnapExit.Example;
+using SnapExit.Tests.Services;
+using SnapExit.Tests.Entities;
+using SnapExit.Services;
 
 namespace SnapExit.Benchmark;
 
@@ -22,7 +25,7 @@ public class MiddlewareIntegrationTests
             {
                 services.AddLogging(configure => configure.AddConsole());
                 services.AddControllers();
-                services.AddSnapExit<SnapExitReponse>();
+                services.AddSnapExit();
             })
             .Configure(app =>
             {
@@ -46,48 +49,25 @@ public class MiddlewareIntegrationTests
     [Fact]
     public async Task Middleware_Should_Snap_Exit()
     {
-        // Arrange
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-
+        // Arrange & Act
         var response = await _client.GetAsync("BenchMark/SnapExit");
 
-        stopwatch.Stop();
-
-        // Log the timings and counts
-        _logger.LogInformation($"Total Execution Time for Exception Test: {stopwatch.ElapsedMilliseconds} ms");
+        // Assert
         Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
-    public async Task Middleware_Should_Throw_Exception()
+    public async Task Service_ShouldSnapExit()
     {
         // Arrange
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
+        SnapExitManagerTest testService = new SnapExitManagerTest(new ExecutionControlService());
+        SnapExitReponse reponse = new SnapExitReponse() { Message = "This is a message that has passed" };
 
-        var response = await _client.GetAsync("BenchMark/Exception");
+        // Act
+        await testService.SetupSnapExit(reponse);
 
-        stopwatch.Stop();
-
-        // Log the timings and counts
-        _logger.LogInformation($"Total Execution Time for Exception Test: {stopwatch.ElapsedMilliseconds} ms");
-    }
-
-    [Fact]
-    public async Task Middleware_Should_Result()
-    {
-        // Arrange
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        _logger.LogInformation("HERE");
-
-        var result = await _client.GetAsync("BenchMark/Result");
-
-        stopwatch.Stop();
-
-        // Log the timings and counts
-        _logger.LogInformation($"Total Execution Time for Exception Test: {stopwatch.ElapsedMilliseconds} ms");
-        Assert.Equal(System.Net.HttpStatusCode.NotFound, result.StatusCode);
+        // Assert
+        Assert.Equal(reponse, testService.response);
+        Assert.NotNull(testService.enviroument);
     }
 }

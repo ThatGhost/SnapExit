@@ -5,6 +5,8 @@ namespace SnapExit.Interfaces;
 
 public interface IExecutionControlService
 {
+    public object EnviroumentData { get; set; }
+
     /// <summary>
     /// Stops the current request execution and returns the provided response to the client
     /// </summary>

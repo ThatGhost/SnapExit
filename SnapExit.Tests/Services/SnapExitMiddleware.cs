@@ -3,7 +3,7 @@ using SnapExit.Example.Entities;
 using SnapExit.Services;
 using System.Text.Json;
 
-namespace SnapExit.Benchmark;
+namespace SnapExit.Tests.Services;
 
 public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, HttpContext>
 {
@@ -23,11 +23,8 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         // SnapExit specific setup
         executionControlService.EnviroumentData = context;
 
-        // get the task of the request
-        var task = _next(context);
-
         // now SnapExit flings into action
-        RegisterSnapExit(task, linkedCts, executionControlService);
+        RegisterSnapExit(() => _next(context), linkedCts, executionControlService);
         return Task.CompletedTask;
     }
 

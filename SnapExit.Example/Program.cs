@@ -16,7 +16,7 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddSnapExit<CustomResponseData>();
+        builder.Services.AddSnapExit();
 
         builder.Services.AddTransient<IWeatherForecastService, WeatherForecastService>();
         builder.Services.AddScoped<IAssertionService, AssertionService>();

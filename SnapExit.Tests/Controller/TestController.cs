@@ -40,7 +40,6 @@ public class TestController : ControllerBase
             },
             StatusCode = 404
         });
-        await Task.Delay(1000);
-        await Task.Delay(1000);
+        await Task.Delay(10000); // makes sure the next line is not done
     }
 }

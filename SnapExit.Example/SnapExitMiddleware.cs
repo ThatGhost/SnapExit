@@ -22,11 +22,8 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         // SnapExit specific setup for middleware
         executionControlService.EnviroumentData = context;
 
-        // get the task of the request
-        var task = _next(context);
-
         // now SnapExit flings into action
-        RegisterSnapExit(task, linkedCts, executionControlService);
+        RegisterSnapExit(() => _next(context), linkedCts, executionControlService);
         return Task.CompletedTask;
     }
 
