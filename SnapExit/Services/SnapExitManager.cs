@@ -6,6 +6,7 @@ public class SnapExitManager<TResponse,TEnviroument>
 {
     protected delegate Task OnSnapExit(TResponse? responseData, TEnviroument? enviroumentData);
     protected OnSnapExit onSnapExit;
+    CancellationTokenSource _originalTokenSource = new CancellationTokenSource();
 
     private ExecutionControlService? _executionControlService { get; set; }
 
@@ -36,7 +37,8 @@ public class SnapExitManager<TResponse,TEnviroument>
         if (IsTaskCompleted(task)) return;
         
         var etc = executionControlService.GetTokenSource();
-        var token = linkedToken?.Token ?? etc.Token;
+
+        var token = linkedToken?.Token ?? _originalTokenSource.Token;
         
         Task originalTask = Task.Run(async () => {
             await task;
@@ -45,17 +47,19 @@ public class SnapExitManager<TResponse,TEnviroument>
 
         var completedTask = await Task.WhenAny(originalTask, cancelTask);
 
-        if (completedTask == originalTask && !token.IsCancellationRequested)
+        if (completedTask == originalTask && !etc.Token.IsCancellationRequested)
         {
             etc.Cancel();
-            return;
         }
         else
         {
             if (onSnapExit is not null)
                 await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
-            if(linkedToken is not null && linkedToken.Token.CanBeCanceled) linkedToken.Cancel();
-            if(etc.Token.CanBeCanceled) etc.Cancel();
+            if(token.CanBeCanceled)
+            {
+                if (token == linkedToken?.Token) linkedToken.Cancel();
+                else _originalTokenSource.Cancel();
+            }
         }
     }
 
@@ -68,6 +72,9 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async void RegisterSnapExit(Task task, CancellationTokenSource? linkedToken = null, ExecutionControlService? executionControlService = null)
     {
+        // i am in a function path not a injection path
+        if(executionControlService is not null) _originalTokenSource = new CancellationTokenSource();
+
         await DoTaskRace(task, 
             executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"),
             linkedToken);
@@ -82,6 +89,9 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async Task RegisterSnapExitAsync(Task task, CancellationTokenSource? linkedToken = null, ExecutionControlService? executionControlService = null)
     {
+        // i am in a function path not a injection path
+        if (executionControlService is not null) _originalTokenSource = new CancellationTokenSource();
+
         await DoTaskRace(task,
             executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"),
             linkedToken);
