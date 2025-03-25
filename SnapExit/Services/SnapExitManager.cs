@@ -26,18 +26,19 @@ public class SnapExitManager<TResponse,TEnviroument>
 
     private async Task DoTaskRace(Task task, ExecutionControlService executionControlService, CancellationTokenSource? linkedToken = null)
     {
-        var exTokenSource = executionControlService.GetTokenSource();
-
-        var token = linkedToken?.Token ?? exTokenSource.Token;
+        if (task.Status != TaskStatus.Running || task.Status != TaskStatus.RanToCompletion) return;
+        
+        var etc = executionControlService.GetTokenSource();
+        var token = linkedToken?.Token ?? etc.Token;
         
         Task originalTask = new Task(async () => await task, token);
-        using Task cancelTask = Task.Delay(Timeout.Infinite, exTokenSource.Token);
+        using Task cancelTask = Task.Delay(Timeout.Infinite, etc.Token);
 
         var completedTask = await Task.WhenAny(originalTask, cancelTask).ConfigureAwait(false);
 
         if (completedTask == originalTask && !token.IsCancellationRequested)
         {
-            exTokenSource.Cancel();
+            etc.Cancel();
             return;
         }
         else
@@ -45,7 +46,7 @@ public class SnapExitManager<TResponse,TEnviroument>
             if (onSnapExit is not null)
                 await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
             if(linkedToken is not null && linkedToken.Token.CanBeCanceled) linkedToken.Cancel();
-            if(exTokenSource.Token.CanBeCanceled) exTokenSource.Cancel();
+            if(etc.Token.CanBeCanceled) etc.Cancel();
         }
     }
 
@@ -70,7 +71,7 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <param name="linkedToken">A token already in use by your program</param>
     /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
-    public async Task RegisterSnapExitASync(Task task, CancellationTokenSource? linkedToken = null, ExecutionControlService? executionControlService = null)
+    public async Task RegisterSnapExitAsync(Task task, CancellationTokenSource? linkedToken = null, ExecutionControlService? executionControlService = null)
     {
         await DoTaskRace(task,
             executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"),

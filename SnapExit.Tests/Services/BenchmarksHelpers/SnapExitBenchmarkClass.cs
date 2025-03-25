@@ -1,44 +1,58 @@
 ﻿using SnapExit.Services;
+using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace SnapExit.Tests.Services.BenchmarksHelpers;
 
 class SnapExitBenchmarkClass : SnapExitManager<object, object>
 {
     private readonly ExecutionControlService executionControlService;
-    private readonly Random random = new Random();
 
-    public SnapExitBenchmarkClass(ExecutionControlService executionControlService): base(executionControlService)
+    public SnapExitBenchmarkClass(
+        ExecutionControlService executionControlService): base(executionControlService)
     {
         this.executionControlService = executionControlService;
     }
 
-    public async Task<int> DoSnapExit()
+    public async Task DoSnapExit()
     {
-        int rnd = random.Next();
-        Task newTask = new Task(() => { rnd++; executionControlService.StopExecution(); Task.Delay(10000); });
-        await newTask;
-        RegisterSnapExit(newTask);
-        return rnd;
+        await RegisterSnapExitAsync(Task.Run(() =>
+        {
+            return executionControlService.StopExecution();
+        }));
     }
 
-    public async Task<int> DoSnapExitAfterRegister()
+    public async Task DoNoSnapExit()
     {
-        int rnd = random.Next();
-        Task newTask = new Task(() => { rnd++; executionControlService.StopExecution(); Task.Delay(10000); });
-        RegisterSnapExit(newTask);
-        await newTask;
-        return rnd;
+        await RegisterSnapExitAsync(Task.Run(() =>
+        {
+            return Task.CompletedTask;
+        }));
     }
 
-    public async Task<int> DoException()
+    public async Task DoThrowWithSnapAction()
     {
-        int rnd = random.Next();
         try
         {
-            var newTask = new Task(() => { rnd++; throw new Exception(); });
-            await newTask;
-            return rnd;
+            await RegisterSnapExitAsync(Task.Run(() =>
+            {
+                throw new Exception();
+            }));
         }
-        catch (Exception){ return rnd; }
+        catch(Exception) { }
+
+    }
+
+    public async Task DoException()
+    {
+        try
+        {
+            await Task.Run(() =>
+            {
+                throw new Exception();
+            });
+        }
+        catch (Exception){
+        }
     }
 }
