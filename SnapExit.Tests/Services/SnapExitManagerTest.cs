@@ -22,16 +22,15 @@ namespace SnapExit.Tests.Services
             _executionControlService = executionControlService;
         }
 
-        public void SetupSnapExit(SnapExitReponse response)
+        public async Task SetupSnapExit(SnapExitReponse response)
         {
             _executionControlService.EnviroumentData = new { };
-            RegisterSnapExit(SomeLongTask(response));
+            await RegisterSnapExitAsync(SomeLongTask(response));
         }
 
-        private Task SomeLongTask(SnapExitReponse response)
+        private async Task SomeLongTask(SnapExitReponse response)
         {
-            _executionControlService.StopExecution(response);
-            return Task.CompletedTask;
+            await _executionControlService.StopExecution(response);
         }
 
         protected override Task SnapExitResponse(SnapExitReponse? responseData, object? enviroumentData)

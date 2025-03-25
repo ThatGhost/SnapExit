@@ -74,7 +74,7 @@ public class MiddlewareIntegrationTests
         SnapExitReponse reponse = new SnapExitReponse() { Message = "This is a message that has passed" };
 
         // Act
-        testService.SetupSnapExit(reponse);
+        await testService.SetupSnapExit(reponse);
 
         // Assert
         Assert.Equal(reponse, testService.response);

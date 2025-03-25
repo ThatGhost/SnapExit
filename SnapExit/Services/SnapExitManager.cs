@@ -26,7 +26,7 @@ public class SnapExitManager<TResponse,TEnviroument>
 
     private async Task DoTaskRace(Task task, ExecutionControlService executionControlService, CancellationTokenSource? linkedToken = null)
     {
-        if (task.Status != TaskStatus.Running || task.Status != TaskStatus.RanToCompletion) return;
+        if (task.Status == TaskStatus.RanToCompletion) return;
         
         var etc = executionControlService.GetTokenSource();
         var token = linkedToken?.Token ?? etc.Token;
