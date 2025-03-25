@@ -24,17 +24,26 @@ public class SnapExitManager<TResponse,TEnviroument>
         onSnapExit += SnapExitResponse;
     }
 
+    private bool IsTaskCompleted(Task task)
+    {
+        return task.Status == TaskStatus.RanToCompletion
+         || task.Status == TaskStatus.Faulted
+         || task.Status == TaskStatus.Canceled;
+    }
+
     private async Task DoTaskRace(Task task, ExecutionControlService executionControlService, CancellationTokenSource? linkedToken = null)
     {
-        if (task.Status == TaskStatus.RanToCompletion) return;
+        if (IsTaskCompleted(task)) return;
         
         var etc = executionControlService.GetTokenSource();
         var token = linkedToken?.Token ?? etc.Token;
         
-        Task originalTask = new Task(async () => await task, token);
+        Task originalTask = Task.Run(async () => {
+            await task;
+        }, token);
         using Task cancelTask = Task.Delay(Timeout.Infinite, etc.Token);
 
-        var completedTask = await Task.WhenAny(originalTask, cancelTask).ConfigureAwait(false);
+        var completedTask = await Task.WhenAny(originalTask, cancelTask);
 
         if (completedTask == originalTask && !token.IsCancellationRequested)
         {
