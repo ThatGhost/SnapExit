@@ -14,28 +14,31 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
         this.executionControlService = executionControlService;
     }
 
-    public async Task DoSnapExit()
+    public async Task SnapExit_StopExecution()
     {
-        await RegisterSnapExitAsync(Task.Run(() =>
+        await RegisterSnapExitAsync(Task.Run(async() =>
         {
-            return executionControlService.StopExecution();
+            await DoWork();
+            await executionControlService.StopExecution();
         }));
     }
 
-    public async Task DoNoSnapExit()
+    public async Task SnapExit_HappyPath()
     {
-        await RegisterSnapExitAsync(Task.Run(() =>
+        await RegisterSnapExitAsync(Task.Run(async () =>
         {
+            await DoWork();
             return Task.CompletedTask;
         }));
     }
 
-    public async Task DoThrowWithSnapAction()
+    public async Task SnapExit_Exception()
     {
         try
         {
-            await RegisterSnapExitAsync(Task.Run(() =>
+            await RegisterSnapExitAsync(Task.Run(async () =>
             {
+                await DoWork();
                 throw new Exception();
             }));
         }
@@ -43,16 +46,36 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
 
     }
 
-    public async Task DoException()
+    public async Task Vanilla_Exception()
     {
         try
         {
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
+                await DoWork();
                 throw new Exception();
             });
         }
         catch (Exception){
         }
+    }
+
+    public async Task Vanilla_HappyPath()
+    {
+        try
+        {
+            await Task.Run(async () =>
+            {
+                await DoWork();
+            });
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    private Task DoWork()
+    {
+        return Task.CompletedTask;
     }
 }
