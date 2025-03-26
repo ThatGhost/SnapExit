@@ -25,7 +25,7 @@ As you can see with a deep stack debt the performance increase can be up to **x5
 
 ## Usage
 
-Register SnapExit in your Program.cs
+Register SnapExit in your Program.cs (you can also just instantiate the manager)
 
 ```csharp
     builder.Services.AddSnapExit(); // registers the services
