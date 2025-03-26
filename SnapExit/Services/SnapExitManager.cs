@@ -6,7 +6,6 @@ public class SnapExitManager<TResponse,TEnviroument>
 {
     protected delegate Task OnSnapExit(TResponse? responseData, TEnviroument? enviroumentData);
     protected OnSnapExit onSnapExit;
-    CancellationTokenSource _originalTokenSource = new CancellationTokenSource();
 
     private ExecutionControlService? _executionControlService { get; set; }
 
@@ -32,13 +31,14 @@ public class SnapExitManager<TResponse,TEnviroument>
          || task.Status == TaskStatus.Canceled;
     }
 
-    private async Task DoTaskRace(Task task, ExecutionControlService executionControlService, CancellationTokenSource? linkedToken = null)
+    private async Task DoTaskRace(Task task, ExecutionControlService executionControlService)
     {
         if (IsTaskCompleted(task)) return;
         
         var etc = executionControlService.GetTokenSource();
 
-        var token = linkedToken?.Token ?? _originalTokenSource.Token;
+        var originalTs = new CancellationTokenSource();
+        var token = originalTs.Token;
         
         Task originalTask = Task.Run(async () => {
             await task;
@@ -57,44 +57,38 @@ public class SnapExitManager<TResponse,TEnviroument>
                 await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
             if(token.CanBeCanceled)
             {
-                if (token == linkedToken?.Token) linkedToken.Cancel();
-                else _originalTokenSource.Cancel();
+                originalTs.Cancel();
             }
         }
     }
 
     /// <summary>
-    /// This registers that the current task is supposed to use snapExit. 
+    /// This registers that the current task is supposed to use snapExit. Fire and forget
     /// </summary>
     /// <param name="task">The Task that uses SnapExit</param>
     /// <param name="linkedToken">A token already in use by your program</param>
     /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
-    public async void RegisterSnapExit(Task task, CancellationTokenSource? linkedToken = null, ExecutionControlService? executionControlService = null)
+    public async void RegisterSnapExit(Task task, ExecutionControlService? executionControlService = null)
     {
-        // i am in a function path not a injection path
-        if(executionControlService is not null) _originalTokenSource = new CancellationTokenSource();
-
-        await DoTaskRace(task, 
-            executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"),
-            linkedToken);
+        await DoTaskRace(
+            task,
+            executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
+            );
     }
 
     /// <summary>
-    /// This registers that the current task is supposed to use snapExit. 
+    /// This registers that the current task is supposed to use snapExit. waits untill its done
     /// </summary>
     /// <param name="task">The Task that uses SnapExit</param>
     /// <param name="linkedToken">A token already in use by your program</param>
     /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
-    public async Task RegisterSnapExitAsync(Task task, CancellationTokenSource? linkedToken = null, ExecutionControlService? executionControlService = null)
+    public async Task RegisterSnapExitAsync(Task task, ExecutionControlService? executionControlService = null)
     {
-        // i am in a function path not a injection path
-        if (executionControlService is not null) _originalTokenSource = new CancellationTokenSource();
-
         await DoTaskRace(task,
-            executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters"),
-            linkedToken);
+            executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
+            );
     }
 
     protected virtual Task SnapExitResponse(TResponse? responseData, TEnviroument? enviroumentData)

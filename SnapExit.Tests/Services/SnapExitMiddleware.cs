@@ -14,18 +14,13 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         _next = next;
     }
 
-    public Task Invoke(HttpContext context, ExecutionControlService executionControlService)
+    public async Task Invoke(HttpContext context, ExecutionControlService executionControlService)
     {
-        // Create a linked token for ASP.NET Core API to work
-        var cts = executionControlService.GetTokenSource();
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(context.RequestAborted, cts.Token);
-
         // SnapExit specific setup
         executionControlService.EnviroumentData = context;
 
         // now SnapExit flings into action
-        RegisterSnapExit(_next(context), linkedCts, executionControlService);
-        return Task.CompletedTask;
+        await RegisterSnapExitAsync(_next(context), executionControlService);
     }
 
     protected override async Task SnapExitResponse(CustomResponseData? response, HttpContext? context)
