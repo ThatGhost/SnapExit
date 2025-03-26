@@ -18,16 +18,15 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
     {
         await RegisterSnapExitAsync(new Task(async() =>
         {
-            await DoWork();
             await executionControlService.StopExecution();
         }));
     }
 
     public async Task SnapExit_HappyPath()
     {
-        await RegisterSnapExitAsync(new Task(async () =>
+        await RegisterSnapExitAsync(new Task(() =>
         {
-            await DoWork();
+            
         }));
     }
 
@@ -37,13 +36,15 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
         {
             await RegisterSnapExitAsync(new Task(async () =>
             {
-                await DoWork();
                 throw new Exception();
             }));
         }
         catch(Exception) { }
     }
+}
 
+public sealed class VanillaBenchmarkClass
+{
     public async Task Vanilla_Exception()
     {
         try
@@ -54,7 +55,8 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
                 throw new Exception();
             });
         }
-        catch (Exception){
+        catch (Exception)
+        {
         }
     }
 

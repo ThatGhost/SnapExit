@@ -33,7 +33,7 @@ class SnapExitBenchmarkClassStack : SnapExitManager<object, object>
 
     private async Task StackerHappyPath(int i)
     {
-        if (i != 0) await StackerStopExecution(i - 1);
+        if (i != 0) await StackerHappyPath(i - 1);
     }
 
 
@@ -48,9 +48,14 @@ class SnapExitBenchmarkClassStack : SnapExitManager<object, object>
 
     private async Task StackerException(int i)
     {
-        if (i != 0) await StackerStopExecution(i - 1);
-        await executionControlService.StopExecution();
+        if (i != 0) await StackerException(i - 1);
+        throw new Exception();
     }
+}
+
+public sealed class VannilaBenchmarkClassStack
+{
+    private const int stackDepth = 100;
 
     public async Task Vanilla_Exception()
     {
@@ -58,8 +63,15 @@ class SnapExitBenchmarkClassStack : SnapExitManager<object, object>
         {
             await StackerException(stackDepth);
         }
-        catch (Exception){
+        catch (Exception)
+        {
         }
+    }
+
+    private async Task StackerException(int i)
+    {
+        if (i != 0) await StackerException(i - 1);
+        throw new Exception();
     }
 
     public async Task Vanilla_HappyPath()
@@ -71,5 +83,10 @@ class SnapExitBenchmarkClassStack : SnapExitManager<object, object>
         catch (Exception)
         {
         }
+    }
+
+    private async Task StackerHappyPath(int i)
+    {
+        if (i != 0) await StackerHappyPath(i - 1);
     }
 }

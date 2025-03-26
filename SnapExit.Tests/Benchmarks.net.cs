@@ -29,14 +29,14 @@ public class Benchmarks
     [Benchmark]
     public async Task Vanilla_HappyPath()
     {
-        var bm = new SnapExitBenchmarkClass(new());
+        var bm = new VanillaBenchmarkClass();
         await bm.Vanilla_HappyPath();
     }
 
     [Benchmark]
     public async Task Vanilla_Exception()
     {
-        var bm = new SnapExitBenchmarkClass(new());
+        var bm = new VanillaBenchmarkClass();
         await bm.Vanilla_Exception();
     }
 }
