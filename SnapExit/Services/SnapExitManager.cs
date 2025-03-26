@@ -67,7 +67,9 @@ public class SnapExitManager<TResponse,TEnviroument>
     {
         await Snap(
             task,
-            executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
+            executionControlService 
+            ?? _executionControlService 
+            ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
             );
     }
 
@@ -80,8 +82,11 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async Task RegisterSnapExitAsync(Task task, ExecutionControlService? executionControlService = null)
     {
-        await Snap(task,
-            executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
+        await Snap(
+            task,
+            executionControlService 
+            ?? _executionControlService 
+            ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
             );
     }
 
