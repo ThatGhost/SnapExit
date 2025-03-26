@@ -1,4 +1,4 @@
-
+﻿
 # Snap exit
 nuget link: [SnapExit](https://www.nuget.org/packages/SnapExit/)
 
@@ -7,13 +7,22 @@ A nuget package that allows for exception-like behavior to validate state in any
 Any feedback is helpful. Please leave it in the Issues section.
 
 ## Performance
-The package is meant to replace exceptions but still keeps (or improves) the performance of IActionResult
+The package is meant to replace exceptions but still keeps the performance cost at a minimum.
+Still with a dept of 1. The performance is still **x10** over regular exception.
+Most of the lost performance in this benchmarks is because of initialization. When u negate for that the loss is even smaller (-200ns).
 
-| Exceptions | IActionResult | SnapExit |
-|------------|---------------|----------|
-| 200ms      | 60ms          | 60ms     |
+| Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
+|------------|----------|-----------|--------------------|
+| 11_500ns   | 1100ns   | 740ns     | 1100ns             |
 
-*Results may vary based on use case. but expect a minimum 2x improvement over exceptions 
+
+When u increase the stack dept the performance of exceptions becomes worse. So with a 100 deep stack these are the benchmarking results.
+As you can see with a deep stack debt the performance increase can be up to **x50**.
+
+| Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
+|------------|----------|-----------|--------------------|
+| 460μs      | 8μs      | 1,3μs     | 1,4μs              |
+
 ## Usage
 
 Register SnapExit in your Program.cs
