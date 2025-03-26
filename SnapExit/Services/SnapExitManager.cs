@@ -31,34 +31,28 @@ public class SnapExitManager<TResponse,TEnviroument>
          || task.Status == TaskStatus.Canceled;
     }
 
-    private async Task DoTaskRace(Task task, ExecutionControlService executionControlService)
+    private async Task Snap(Task task, ExecutionControlService executionControlService)
     {
         if (IsTaskCompleted(task)) return;
-        
+
         var etc = executionControlService.GetTokenSource();
+        var cancellationToken = etc.Token;
 
-        var originalTs = new CancellationTokenSource();
-        var token = originalTs.Token;
-        
-        Task originalTask = Task.Run(async () => {
+        Task originalTask = new Task(async () =>
+        {
             await task;
-        }, token);
-        using Task cancelTask = Task.Delay(Timeout.Infinite, etc.Token);
+        }, cancellationToken);
 
-        var completedTask = await Task.WhenAny(originalTask, cancelTask);
-
-        if (completedTask == originalTask && !etc.Token.IsCancellationRequested)
+        try
         {
-            etc.Cancel();
+            originalTask.Start();
+            await originalTask;
         }
-        else
+        catch (TaskCanceledException) { }
+
+        if (originalTask.IsCanceled && onSnapExit is not null)
         {
-            if (onSnapExit is not null)
-                await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
-            if(token.CanBeCanceled)
-            {
-                originalTs.Cancel();
-            }
+            await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
         }
     }
 
@@ -71,7 +65,7 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async void RegisterSnapExit(Task task, ExecutionControlService? executionControlService = null)
     {
-        await DoTaskRace(
+        await Snap(
             task,
             executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
             );
@@ -86,7 +80,7 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async Task RegisterSnapExitAsync(Task task, ExecutionControlService? executionControlService = null)
     {
-        await DoTaskRace(task,
+        await Snap(task,
             executionControlService ?? _executionControlService ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
             );
     }

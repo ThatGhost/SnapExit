@@ -3,7 +3,7 @@ using SnapExit.Tests.Services.BenchmarksHelpers;
 
 namespace SnapExit.Tests;
 
-public class Benchmarks
+public class BenchmarksStack
 {
     [Benchmark]
     public async Task SnapExit_WithExit()
