@@ -45,7 +45,7 @@ public class SnapExitManager<TResponse,TEnviroument>
 
         try
         {
-            originalTask.Start();
+            if(!originalTask.IsCompleted) originalTask.Start();
             await originalTask;
         }
         catch (TaskCanceledException) { }
