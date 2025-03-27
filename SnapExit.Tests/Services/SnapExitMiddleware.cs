@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace SnapExit.Tests.Services;
 
-public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, HttpContext>
+public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData>
 {
     private readonly RequestDelegate _next;
 
@@ -14,16 +14,19 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         _next = next;
     }
 
-    public async Task Invoke(HttpContext context, ExecutionControlService executionControlService)
+    public async Task Invoke(HttpContext context)
     {
-        // SnapExit specific setup
-        executionControlService.EnviroumentData = context;
+        OnSnapExit callback = async (response) =>
+        {
+            await WriteResponse(response, context);
+        };
 
-        // now SnapExit flings into action
-        await RegisterSnapExitAsync(_next(context), executionControlService);
+        onSnapExit += callback;
+        await RegisterSnapExitAsync(_next(context));
+        onSnapExit -= callback;
     }
 
-    protected override async Task SnapExitResponse(CustomResponseData? response, HttpContext? context)
+    private async Task WriteResponse(CustomResponseData? response, HttpContext? context)
     {
         if (response is null)
             throw new Exception("Something went wrong with state");

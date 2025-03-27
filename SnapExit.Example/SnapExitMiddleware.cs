@@ -1,10 +1,11 @@
-﻿using SnapExit.Example.Entities;
+﻿using Microsoft.AspNetCore.Http;
+using SnapExit.Example.Entities;
 using SnapExit.Services;
 using System.Text.Json;
 
-namespace SnapExit.Example;
+namespace SnapExit.Tests.Services;
 
-public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, HttpContext>
+public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData>
 {
     private readonly RequestDelegate _next;
 
@@ -13,17 +14,19 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         _next = next;
     }
 
-    public Task Invoke(HttpContext context, ExecutionControlService executionControlService)
+    public async Task Invoke(HttpContext context)
     {
-        // SnapExit specific setup for middleware
-        executionControlService.EnviroumentData = context;
+        OnSnapExit callback = async (response) =>
+        {
+            await WriteResponse(response, context);
+        };
 
-        // now SnapExit flings into action
-        RegisterSnapExit(_next(context), executionControlService);
-        return Task.CompletedTask;
+        onSnapExit += callback;
+        await RegisterSnapExitAsync(_next(context));
+        onSnapExit -= callback;
     }
 
-    protected override async Task SnapExitResponse(CustomResponseData? response, HttpContext? context)
+    private async Task WriteResponse(CustomResponseData? response, HttpContext? context)
     {
         if (response is null)
             throw new Exception("Something went wrong with state");
@@ -44,6 +47,7 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
 
         if (response.Body is not null)
         {
+            context.Response.ContentType = "application/json";
             await context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(response.Body));
         }
     }

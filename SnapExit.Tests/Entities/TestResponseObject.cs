@@ -1,6 +1,6 @@
 ﻿namespace SnapExit.Tests.Entities;
 
-public sealed class SnapExitReponse
+public sealed class TestResponseObject
 {
     public required string Message { get; set; }
 }

@@ -6,16 +6,16 @@ namespace SnapExit.Example.Services;
 
 public sealed class AssertionService : IAssertionService
 {
-    private readonly IExecutionControlService executionControlService;
+    private readonly ISnap executionControlService;
 
-    public AssertionService(IExecutionControlService executionControlService)
+    public AssertionService(ISnap executionControlService)
     {
         this.executionControlService = executionControlService;
     }
 
     public void Forbidden(string message, string token)
     {
-        executionControlService.StopExecution(new CustomResponseData()
+        executionControlService.Exit(new CustomResponseData()
         {
             StatusCode = 403,
             Body = new { message },
@@ -25,7 +25,7 @@ public sealed class AssertionService : IAssertionService
 
     public void NotFound()
     {
-        executionControlService.StopExecution(new CustomResponseData()
+        executionControlService.Exit(new CustomResponseData()
         {
             StatusCode = 404,
         });
@@ -33,7 +33,7 @@ public sealed class AssertionService : IAssertionService
 
     public void Teapot(string message)
     {
-        executionControlService.StopExecution(new CustomResponseData()
+        executionControlService.Exit(new CustomResponseData()
         {
             StatusCode = 418,
             Body = new { message }
