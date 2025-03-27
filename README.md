@@ -28,7 +28,7 @@ As you can see with a deep stack debt the performance increase can be up to **x6
 ## Usage
 
 To throw a SnapExit it is as simple as using the static Snap class
-
+**Do not forget to await the `Snap.Exit()`. if you dont the next lines might be executed**
 ```csharp
   public class YourService {
 
@@ -75,19 +75,14 @@ For example:
 
 ```csharp
 public class ErrorService {
-    private readonly IExecutionControlService _executionControlService;
-    public YourService(IExecutionControlService executionControlService) {
-        _executionControlService = executionControlService;
-    }
-
     public Task Foo(string message) {
-        return _executionControlService.StopExecution(new {
+        await Snap.Exit(new {
             message
         });
     }
 
     public Task Bar() {
-        return _executionControlService.StopExecution(new {
+        await Snap.Exit(new {
             message = "Something went wrong!"
         });
     }
