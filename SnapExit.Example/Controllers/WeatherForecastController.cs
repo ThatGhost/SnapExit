@@ -21,8 +21,8 @@ public sealed class WeatherForecastController : ControllerBase
     }
 
     [HttpPut(Name = "UpdateWeatherForecast")]
-    public void Update([FromBody] WeatherForecast weatherForecast)
+    public async Task Update([FromBody] WeatherForecast weatherForecast)
     {
-        _weatherForecastService.UpdateWeatherForecast(weatherForecast);
+        await _weatherForecastService.UpdateWeatherForecast(weatherForecast);
     }
 }

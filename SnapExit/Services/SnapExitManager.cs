@@ -1,28 +1,9 @@
-﻿using SnapExit.Interfaces;
+﻿namespace SnapExit.Services;
 
-namespace SnapExit.Services;
-
-public class SnapExitManager<TResponse,TEnviroument>
+public class SnapExitManager<TResponse>
 {
-    protected delegate Task OnSnapExit(TResponse? responseData, TEnviroument? enviroumentData);
-    protected OnSnapExit onSnapExit;
-
-    private ExecutionControlService? _executionControlService { get; set; }
-
-    protected SnapExitManager() {
-        onSnapExit += SnapExitResponse;
-    }
-    protected SnapExitManager(ExecutionControlService executionControlService)
-    {
-        _executionControlService = executionControlService;
-        onSnapExit += SnapExitResponse;
-    }
-
-    protected SnapExitManager(IExecutionControlService executionControlService)
-    {
-        _executionControlService = (ExecutionControlService)executionControlService;
-        onSnapExit += SnapExitResponse;
-    }
+    protected delegate Task OnSnapExit(TResponse? responseData);
+    protected OnSnapExit? onSnapExit;
 
     private bool IsTaskCompleted(Task task)
     {
@@ -31,29 +12,39 @@ public class SnapExitManager<TResponse,TEnviroument>
          || task.Status == TaskStatus.Canceled;
     }
 
-    private async Task Snap(Task task, ExecutionControlService executionControlService)
+    private async Task SnapRegister(Task task)
     {
         if (IsTaskCompleted(task)) return;
 
-        var etc = executionControlService.GetTokenSource();
-        var cancellationToken = etc.Token;
+        var etc = Snap.GetTokenSource(true);
 
-        Task originalTask = new Task(async () =>
+        if(etc.Item2)
         {
-            await task;
-        }, cancellationToken);
+            Task originalTask = new Task(async () =>
+            {
+                await task;
+            }, etc.Item1.Token);
 
-        try
-        {
-            if(!originalTask.IsCompleted) originalTask.Start();
-            await originalTask;
+            try
+            {
+                if (!originalTask.IsCompleted) originalTask.Start();
+                await originalTask;
+                if(!originalTask.IsCanceled) Snap.GetTokenSource(true);
+            }
+            catch (TaskCanceledException) { }
+
+            if (originalTask.IsCanceled && onSnapExit is not null)
+            {
+                await onSnapExit.Invoke((TResponse?)(Snap.GetResponseData(etc.Item1.Token)));
+            }
         }
-        catch (TaskCanceledException) { }
-
-        if (originalTask.IsCanceled && onSnapExit is not null)
+        else // edge case where exit was called before register
         {
-            await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
+            etc.Item1.Cancel();
+            if(onSnapExit is not null)
+                await onSnapExit.Invoke((TResponse?)(Snap.GetResponseData(etc.Item1.Token)));
         }
+
     }
 
     /// <summary>
@@ -63,14 +54,9 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <param name="linkedToken">A token already in use by your program</param>
     /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
-    public async void RegisterSnapExit(Task task, ExecutionControlService? executionControlService = null)
+    public async void RegisterSnapExit(Task task)
     {
-        await Snap(
-            task,
-            executionControlService 
-            ?? _executionControlService 
-            ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
-            );
+        await SnapRegister(task);
     }
 
     /// <summary>
@@ -80,18 +66,8 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// <param name="linkedToken">A token already in use by your program</param>
     /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
-    public async Task RegisterSnapExitAsync(Task task, ExecutionControlService? executionControlService = null)
+    public async Task RegisterSnapExitAsync(Task task)
     {
-        await Snap(
-            task,
-            executionControlService 
-            ?? _executionControlService 
-            ?? throw new ArgumentException("ExecutionControlService not registered. Add it to the constructor or pass it through the parameters")
-            );
-    }
-
-    protected virtual Task SnapExitResponse(TResponse? responseData, TEnviroument? enviroumentData)
-    {
-        return Task.CompletedTask;
+        await SnapRegister(task);
     }
 }
