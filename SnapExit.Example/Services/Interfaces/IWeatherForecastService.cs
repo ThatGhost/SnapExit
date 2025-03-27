@@ -3,5 +3,5 @@
 public interface IWeatherForecastService
 {
     public WeatherForecast GetWeatherForecast();
-    public void UpdateWeatherForecast(WeatherForecast weatherForecast);
+    public Task UpdateWeatherForecast(WeatherForecast weatherForecast);
 }

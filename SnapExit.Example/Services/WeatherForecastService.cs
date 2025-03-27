@@ -29,11 +29,11 @@ public sealed class WeatherForecastService : IWeatherForecastService
         return _weatherForecast;
     }
 
-    public void UpdateWeatherForecast(WeatherForecast weatherForecast)
+    public async Task UpdateWeatherForecast(WeatherForecast weatherForecast)
     {
-        if (weatherForecast.TemperatureC < -20) assertionService.Forbidden("Wow i hate it here", "abc123def456");
-        if (weatherForecast.TemperatureC > 50) assertionService.Teapot("Wow i hate it here");
-        if (weatherForecast.Date < DateOnly.FromDateTime(DateTime.Now)) assertionService.NotFound();
+        if (weatherForecast.TemperatureC < -20) await assertionService.Forbidden("Wow i hate it here", "abc123def456");
+        if (weatherForecast.TemperatureC > 50) await assertionService.Teapot("Wow i hate it here");
+        if (weatherForecast.Date < DateOnly.FromDateTime(DateTime.Now)) await assertionService.NotFound();
 
         _weatherForecast = weatherForecast;
     }

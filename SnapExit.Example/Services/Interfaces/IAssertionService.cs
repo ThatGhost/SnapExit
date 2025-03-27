@@ -2,7 +2,7 @@
 
 public interface IAssertionService
 {
-    public void NotFound();
-    public void Teapot(string message);
-    public void Forbidden(string message, string token);
+    public Task NotFound();
+    public Task Teapot(string message);
+    public Task Forbidden(string message, string token);
 }
