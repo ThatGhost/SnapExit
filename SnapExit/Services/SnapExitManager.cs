@@ -58,7 +58,6 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// This registers that the current task is supposed to use snapExit. Fire and forget
     /// </summary>
     /// <param name="task">The Task that uses SnapExit</param>
-    /// <param name="linkedToken">A token already in use by your program</param>
     /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async void RegisterSnapExit(Task task, ExecutionControlService? executionControlService = null)
@@ -73,7 +72,6 @@ public class SnapExitManager<TResponse,TEnviroument>
     /// This registers that the current task is supposed to use snapExit. waits untill its done
     /// </summary>
     /// <param name="task">The Task that uses SnapExit</param>
-    /// <param name="linkedToken">A token already in use by your program</param>
     /// <param name="executionControlService">If the ExecutionControlService is not passed through the constructor you need to pass it here</param>
     /// <exception cref="ArgumentException">If the ExecutionControlService was not passed in either the constructor or the function</exception>
     public async Task RegisterSnapExitAsync(Task task, ExecutionControlService? executionControlService = null)
