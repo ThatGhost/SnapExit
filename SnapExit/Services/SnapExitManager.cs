@@ -2,7 +2,7 @@
 
 namespace SnapExit.Services;
 
-public class SnapExitManager<TResponse,TEnviroument>
+public class SnapExitManager<TResponse,TEnvironment>
 {
     protected delegate Task OnSnapExit(TResponse? responseData, TEnviroument? enviroumentData);
     protected OnSnapExit onSnapExit;
@@ -46,7 +46,7 @@ public class SnapExitManager<TResponse,TEnviroument>
         else
         {
             if (onSnapExit is not null)
-                await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnviroument?)executionControlService.EnviroumentData);
+                await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnvironment?)executionControlService.EnviroumentData);
             if(token.CanBeCanceled)
             {
                 originalTs.Cancel();
@@ -81,7 +81,7 @@ public class SnapExitManager<TResponse,TEnviroument>
             );
     }
 
-    protected virtual Task SnapExitResponse(TResponse? responseData, TEnviroument? enviroumentData)
+    protected virtual Task SnapExitResponse(TResponse? responseData, TEnvironment? enviroumentData)
     {
         return Task.CompletedTask;
     }
