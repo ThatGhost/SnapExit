@@ -36,7 +36,7 @@ To throw a SnapExit it is as simple as using the static Snap class
     });
 
     // New way
-    Snap.Exit(new {
+    await Snap.Exit(new {
         // any response data defined in the ExitManager can be passed here
     });
 ```
