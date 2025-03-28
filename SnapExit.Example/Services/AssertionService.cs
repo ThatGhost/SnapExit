@@ -1,21 +1,14 @@
 ﻿using SnapExit.Example.Entities;
 using SnapExit.Example.Services.Interfaces;
-using SnapExit.Interfaces;
+using SnapExit.Services;
 
 namespace SnapExit.Example.Services;
 
 public sealed class AssertionService : IAssertionService
 {
-    private readonly IExecutionControlService executionControlService;
-
-    public AssertionService(IExecutionControlService executionControlService)
+    public async Task Forbidden(string message, string token)
     {
-        this.executionControlService = executionControlService;
-    }
-
-    public void Forbidden(string message, string token)
-    {
-        executionControlService.StopExecution(new CustomResponseData()
+        await Snap.Exit(new CustomResponseData()
         {
             StatusCode = 403,
             Body = new { message },
@@ -23,17 +16,17 @@ public sealed class AssertionService : IAssertionService
         });
     }
 
-    public void NotFound()
+    public async Task NotFound()
     {
-        executionControlService.StopExecution(new CustomResponseData()
+        await Snap.Exit(new CustomResponseData()
         {
             StatusCode = 404,
         });
     }
 
-    public void Teapot(string message)
+    public async Task Teapot(string message)
     {
-        executionControlService.StopExecution(new CustomResponseData()
+        await Snap.Exit(new CustomResponseData()
         {
             StatusCode = 418,
             Body = new { message }

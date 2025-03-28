@@ -1,43 +1,32 @@
-﻿using SnapExit.Interfaces;
-using SnapExit.Services;
+﻿using SnapExit.Services;
 using SnapExit.Tests.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SnapExit.Tests.Services
 {
-    class SnapExitManagerTest : SnapExitManager<SnapExitReponse, object>
+    class SnapExitManagerTest : ExitManager<TestResponseObject>
     {
-        private readonly IExecutionControlService _executionControlService;
-
-        // use to Assert in the unit test
-        public SnapExitReponse? response;
-        public object? enviroument;
-
-        public SnapExitManagerTest(IExecutionControlService executionControlService) : base(executionControlService)
+        public async Task SnapExit_WithDelayTest(int delay, TestResponseObject data)
         {
-            _executionControlService = executionControlService;
+            await SetupSnapExit(SomeLongTask(data, delay), (response) =>
+            {
+                if (response?.Message != data.Message) throw new Exception("Response data is not the same");
+                return Task.CompletedTask;
+            });
         }
 
-        public async Task SetupSnapExit(SnapExitReponse response)
+        public async Task SnapExit_NoExit(int delay, TestResponseObject data)
         {
-            _executionControlService.EnviroumentData = new { };
-            await RegisterSnapExitAsync(SomeLongTask(response));
+            await SetupSnapExit(new Task(async () => { await Task.Delay(delay); }), (response) =>
+            {
+                if (response?.Message != data.Message) throw new Exception("Response data is not the same");
+                return Task.CompletedTask;
+            });
         }
 
-        private async Task SomeLongTask(SnapExitReponse response)
+        private async Task SomeLongTask(TestResponseObject response, int delay)
         {
-            await _executionControlService.StopExecution(response);
-        }
-
-        protected override Task SnapExitResponse(SnapExitReponse? responseData, object? enviroumentData)
-        {
-            response = responseData;
-            enviroument = enviroumentData;
-            return Task.CompletedTask;
+            await Task.Delay(delay);
+            await Snap.Exit(response);
         }
     }
 }

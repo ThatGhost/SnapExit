@@ -4,31 +4,21 @@ using System.Threading.Tasks;
 
 namespace SnapExit.Tests.Services.BenchmarksHelpers;
 
-class SnapExitBenchmarkClass : SnapExitManager<object, object>
+class SnapExitBenchmarkClass : ExitManager<object>
 {
-    private readonly ExecutionControlService executionControlService;
-
-    public SnapExitBenchmarkClass(
-        ExecutionControlService executionControlService): base(executionControlService)
-    {
-        this.executionControlService = executionControlService;
-    }
-
     public async Task SnapExit_StopExecution()
     {
-        await RegisterSnapExitAsync(Task.Run(async() =>
+        await SetupSnapExit(new Task(async() =>
         {
-            await DoWork();
-            await executionControlService.StopExecution();
+            await Snap.Exit();
         }));
     }
 
     public async Task SnapExit_HappyPath()
     {
-        await RegisterSnapExitAsync(Task.Run(async () =>
+        await SetupSnapExit(new Task(() =>
         {
-            await DoWork();
-            return Task.CompletedTask;
+            
         }));
     }
 
@@ -36,16 +26,17 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
     {
         try
         {
-            await RegisterSnapExitAsync(Task.Run(async () =>
+            await SetupSnapExit(new Task(() =>
             {
-                await DoWork();
                 throw new Exception();
             }));
         }
         catch(Exception) { }
-
     }
+}
 
+public sealed class VanillaBenchmarkClass
+{
     public async Task Vanilla_Exception()
     {
         try
@@ -56,7 +47,8 @@ class SnapExitBenchmarkClass : SnapExitManager<object, object>
                 throw new Exception();
             });
         }
-        catch (Exception){
+        catch (Exception)
+        {
         }
     }
 

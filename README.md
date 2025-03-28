@@ -1,99 +1,72 @@
-
-# Snap exit
-nuget link: [SnapExit](https://www.nuget.org/packages/SnapExit/)
+﻿# Snap exit 3.0.0
+[![NuGet](https://img.shields.io/nuget/v/SnapExit.svg)](https://www.nuget.org/packages/SnapExit/)
+[![NuGet](https://img.shields.io/nuget/dt/SnapExit.svg)](https://www.nuget.org/packages/SnapExit/)
 
 A nuget package that allows for exception-like behavior to validate state in any ASP.NET project, but with all the performance benefits of cancellation tokens.
 
 Any feedback is helpful. Please leave it in the Issues section.
+3.0 aims for a stable release with a few new features and a lot of bug fixes. From now on the package will be safelly maintained and updated with new features.
 
 ## Performance
-The package is meant to replace exceptions but still keeps (or improves) the performance of IActionResult
+The package is meant to replace exceptions but still keeps the performance cost at a minimum.
+Still with a dept of 1 (worst case scenario). The performance is still **x10** over regular exception.
+Most of the lost performance in this benchmarks is because of the one time cost of initialization. When u negate for that, the loss is even smaller (-200ns).
 
-| Exceptions | IActionResult | SnapExit |
-|------------|---------------|----------|
-| 200ms      | 60ms          | 60ms     |
+| Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
+|------------|----------|-----------|--------------------|
+| 11_400ns   | 1300ns   | 700ns     | 1100ns             |
 
-*Results may vary based on use case. but expect a minimum 2x improvement over exceptions 
+
+When u increase the stack dept the performance of exceptions becomes worse. So with a 100 deep stack these are the benchmarking results.
+As you can see with a deep stack debt the performance increase can be up to **x60**.
+
+| Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
+|------------|----------|-----------|--------------------|
+| 460μs      | 5μs      | 1,3μs     | 1,3μs              |
+
 ## Usage
 
-Register SnapExit in your Program.cs
+To throw a SnapExit it is as simple as using the static Snap class
 
+**Do not forget to await the `Snap.Exit()`. if you dont the next lines might be executed**
 ```csharp
-    builder.Services.AddSnapExit(); // registers the services
+    // Old way
+    throw new Exception(new {
+        // pass data to the try catch block
+    });
+
+    // New way
+    await Snap.Exit(new {
+        // any response data defined in the ExitManager can be passed here
+    });
 ```
 
-Inject the ExecutionControlService into your flow and use it like you would an exception:
+And catching it also super simple!
 
 ```csharp
-  public class YourService {
-      private readonly IExecutionControlService _executionControlService;
-      public YourService(IExecutionControlService executionControlService) {
-          _executionControlService = executionControlService;
-      }
+    // Old way
+    Try{
+        await SomeTask();
+    } Catch(Exception e) {
+        // catch code
+    }
 
-      // New way
-      public async Task ThisShouldThrow() {
-          await _executionControlService.StopExecution();
-      }
-
-      // Old way
-      public Task ThisShouldThrow() {
-          throw new Exception();
-      }
-  }
+    // New way
+    SetupSnapExit(SomeTask(), (response) => {
+        // catch code
+    });
 ```
 
-This halts the flow of task immediatly, you can even return custom defined data to the return point:
+To make this work you will need to define a return point for SnapExit. This is made easy by using the ExitManager class!
 ```csharp
-  _executionControlService.StopExecution(new {
-      // any response data can be passed here
-  });
-```
-
-To make this work you will need to define a return point for SnapExit. This is made easy by using the SnapExitManager base class!
-```csharp
-  public class SnapExitReturnPoint : SnapExitManager<ResponseData, EnviroumentData> // the generics are to be implemented by you
+  public class SnapExitReturnPoint : ExitManager<ResponseData> // can be inherited from or instantiated
   {
-      public void ThisCanBeAnyPointOfCode() {
-          onSnapExit += OnSnapExit; // register the callback function or use the virtual protected callback
-          Task task = SomeLongTask();
-          RegisterSnapExit(task);
-      }
-
-      private Task OnSnapExit(ResponseData responseData, EnviroumentData enviroumentData) { // response and enviroument is data passed at error time and register time
-          // Do some code here related to an exit
+      public async Task ThisCanBeAnyPointOfCode() {
+          SetupSnapExit(task, (response) => { // response is of type ResponseData
+            // any catch code goes here
+          });
       }
   }
 ```
 
-Also look at the example to see how you can turn it into a middleware for ASP.NET Core api!
-
-## Recommendation
-
-I recommend creating your own service with specialized responses based on events.
-For example:
-
-```csharp
-public class ErrorService {
-    private readonly IExecutionControlService _executionControlService;
-    public YourService(IExecutionControlService executionControlService) {
-        _executionControlService = executionControlService;
-    }
-
-    public Task Foo(string message) {
-        return _executionControlService.StopExecution(new {
-            message
-        });
-    }
-
-    public Task Bar() {
-        return _executionControlService.StopExecution(new {
-            message = "Something went wrong!"
-        });
-    }
-
-    // Etc
-}
-```
-
-If there is a need for a default implementation, I might create a template.
+Also look at the example project to see how you can turn SnapExit into a blazingly fast middleware for ASP.NET Core api!
