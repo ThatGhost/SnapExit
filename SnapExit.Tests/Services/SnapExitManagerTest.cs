@@ -33,11 +33,10 @@ namespace SnapExit.Tests.Services
             await _executionControlService.StopExecution(response);
         }
 
-        protected override Task SnapExitResponse(SnapExitReponse? responseData, object? enviroumentData)
+        protected override void SnapExitResponse(object? sender, OnSnapExitEventArgs args)
         {
-            response = responseData;
-            enviroument = enviroumentData;
-            return Task.CompletedTask;
+            response = args.ResponseData;
+            enviroument = args.EnvironmentData;
         }
     }
 }

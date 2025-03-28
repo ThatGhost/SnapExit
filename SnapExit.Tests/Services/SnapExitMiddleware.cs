@@ -23,8 +23,11 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         await RegisterSnapExitAsync(_next(context), executionControlService);
     }
 
-    protected override async Task SnapExitResponse(CustomResponseData? response, HttpContext? context)
+    protected override void SnapExitResponse(object? sender, OnSnapExitEventArgs args)
     {
+        var response = args.ResponseData;
+        var context = args.EnvironmentData;
+        
         if (response is null)
             throw new Exception("Something went wrong with state");
         if (context is null)
@@ -44,7 +47,7 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         if (response.Body is not null)
         {
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(response.Body));
+            args.AddTask(context.Response.WriteAsJsonAsync(JsonSerializer.Serialize(response.Body)));
         }
     }
 }

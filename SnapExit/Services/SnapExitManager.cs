@@ -4,24 +4,40 @@ namespace SnapExit.Services;
 
 public class SnapExitManager<TResponse,TEnvironment>
 {
-    protected delegate Task OnSnapExit(TResponse? responseData, TEnviroument? enviroumentData);
-    protected OnSnapExit onSnapExit;
+    /// <summary>
+    /// Provides the response and environment data when invoking <see cref="SnapExitManager{TResponse,TEnvironment}.OnSnapExit"/>.
+    /// Asynchronous handlers should register their asynchronous continuations via <see cref="OnSnapExitEventArgs.AddTask"/>.
+    /// </summary>
+    protected sealed class OnSnapExitEventArgs : EventArgs
+    {
+        internal OnSnapExitEventArgs(TResponse? responseData, TEnvironment? environmentData)
+        {
+            ResponseData = responseData;
+            EnvironmentData = environmentData;
+        }
+
+        public TResponse? ResponseData { get; }
+        public TEnvironment? EnvironmentData { get; }
+        internal List<Task> Tasks { get; } = [];
+        public void AddTask(Task task) => Tasks.Add(task);
+    }
+    protected event EventHandler<OnSnapExitEventArgs>? OnSnapExit;
 
     private ExecutionControlService? _executionControlService { get; set; }
 
     protected SnapExitManager() {
-        onSnapExit += SnapExitResponse;
+        OnSnapExit += SnapExitResponse;
     }
     protected SnapExitManager(ExecutionControlService executionControlService)
+        :this()
     {
         _executionControlService = executionControlService;
-        onSnapExit += SnapExitResponse;
     }
 
     protected SnapExitManager(IExecutionControlService executionControlService)
+        :this()
     {
         _executionControlService = (ExecutionControlService)executionControlService;
-        onSnapExit += SnapExitResponse;
     }
     private async Task DoTaskRace(Task task, ExecutionControlService executionControlService)
     {
@@ -45,8 +61,8 @@ public class SnapExitManager<TResponse,TEnvironment>
         }
         else
         {
-            if (onSnapExit is not null)
-                await onSnapExit.Invoke((TResponse?)(executionControlService.ResponseData), (TEnvironment?)executionControlService.EnviroumentData);
+            await InvokeOnSnapExit(executionControlService);
+            
             if(token.CanBeCanceled)
             {
                 originalTs.Cancel();
@@ -54,6 +70,20 @@ public class SnapExitManager<TResponse,TEnvironment>
         }
     }
 
+    private Task InvokeOnSnapExit(ExecutionControlService executionControlService)
+    {
+        var responseData = (TResponse?)executionControlService.ResponseData;
+        var environmentData = (TEnvironment?)executionControlService.EnviroumentData;
+
+        var args = new OnSnapExitEventArgs(responseData, environmentData);
+        
+        OnSnapExit?.Invoke(sender:this, args);
+
+        var result = Task.WhenAll(args.Tasks);
+
+        return result;
+    }
+    
     /// <summary>
     /// This registers that the current task is supposed to use snapExit. Fire and forget
     /// </summary>
@@ -81,8 +111,6 @@ public class SnapExitManager<TResponse,TEnvironment>
             );
     }
 
-    protected virtual Task SnapExitResponse(TResponse? responseData, TEnvironment? enviroumentData)
-    {
-        return Task.CompletedTask;
-    }
+    protected virtual void SnapExitResponse(object? sender,OnSnapExitEventArgs args)
+    { }
 }
