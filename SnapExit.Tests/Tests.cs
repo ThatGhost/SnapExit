@@ -82,7 +82,7 @@ public class Tests
         await Task.WhenAll(t1, t2, t3);
     }
 
-    [Fact(Skip = "i dont have a solve for this yet")]
+    [Fact(Skip = "")]
     public async Task Service_ShouldSnapExit_ImmediateConcurrentSnapExits()
     {
         // Arrange
