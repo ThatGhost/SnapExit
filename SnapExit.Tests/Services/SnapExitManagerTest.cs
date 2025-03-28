@@ -3,29 +3,24 @@ using SnapExit.Tests.Entities;
 
 namespace SnapExit.Tests.Services
 {
-    class SnapExitManagerTest : SnapExitManager<TestResponseObject>
+    class SnapExitManagerTest : ExitManager<TestResponseObject>
     {
-        // use to Assert in the unit test
-        public TestResponseObject? response;
-
-        public async Task SnapExit_SingleResponseTest(TestResponseObject response)
+        public async Task SnapExit_WithDelayTest(int delay, TestResponseObject data)
         {
-            onSnapExit += (response) =>
+            await SetupSnapExit(SomeLongTask(data, delay), (response) =>
             {
-                this.response = response;
+                if (response?.Message != data.Message) throw new Exception("Response data is not the same");
                 return Task.CompletedTask;
-            };
-            await RegisterSnapExitAsync(SomeLongTask(response,0));
+            });
         }
 
-        public async Task SnapExit_MultipleResponseTest(int delay, TestResponseObject data)
+        public async Task SnapExit_NoExit(int delay, TestResponseObject data)
         {
-            onSnapExit += (response) =>
+            await SetupSnapExit(new Task(async () => { await Task.Delay(delay); }), (response) =>
             {
-                if(response?.Message != data.Message) throw new Exception("Response data is not the same");
+                if (response?.Message != data.Message) throw new Exception("Response data is not the same");
                 return Task.CompletedTask;
-            };
-            await RegisterSnapExitAsync(SomeLongTask(data, delay));
+            });
         }
 
         private async Task SomeLongTask(TestResponseObject response, int delay)

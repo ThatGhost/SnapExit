@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace SnapExit.Tests.Services;
 
-public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData>
+public sealed class SnapExitMiddleware : ExitManager<CustomResponseData>
 {
     private readonly RequestDelegate _next;
 
@@ -16,14 +16,10 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData>
 
     public async Task Invoke(HttpContext context)
     {
-        OnSnapExit callback = async (response) =>
+        await SetupSnapExit(_next(context), async (response) =>
         {
             await WriteResponse(response, context);
-        };
-
-        onSnapExit += callback;
-        await RegisterSnapExitAsync(_next(context));
-        onSnapExit -= callback;
+        });
     }
 
     private async Task WriteResponse(CustomResponseData? response, HttpContext? context)

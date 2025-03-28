@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 
 namespace SnapExit.Tests.Services.BenchmarksHelpers;
 
-class SnapExitBenchmarkClassStack : SnapExitManager<object>
+class SnapExitBenchmarkClassStack : ExitManager<object>
 {
     private const int stackDepth = 100;
 
     public async Task SnapExit_StopExecution()
     {
-        await RegisterSnapExitAsync(StackerStopExecution(stackDepth));
+        await SetupSnapExit(StackerStopExecution(stackDepth));
     }
 
     private async Task StackerStopExecution(int i)
@@ -21,7 +21,7 @@ class SnapExitBenchmarkClassStack : SnapExitManager<object>
 
     public async Task SnapExit_HappyPath()
     {
-        await RegisterSnapExitAsync(StackerHappyPath(stackDepth));
+        await SetupSnapExit(StackerHappyPath(stackDepth));
     }
 
     private async Task StackerHappyPath(int i)
@@ -34,7 +34,7 @@ class SnapExitBenchmarkClassStack : SnapExitManager<object>
     {
         try
         {
-            await RegisterSnapExitAsync(StackerException(stackDepth));
+            await SetupSnapExit(StackerException(stackDepth));
         }
         catch (Exception) { }
     }

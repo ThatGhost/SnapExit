@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace SnapExit.Tests.Services.BenchmarksHelpers;
 
-class SnapExitBenchmarkClass : SnapExitManager<object>
+class SnapExitBenchmarkClass : ExitManager<object>
 {
     public async Task SnapExit_StopExecution()
     {
-        await RegisterSnapExitAsync(new Task(async() =>
+        await SetupSnapExit(new Task(async() =>
         {
             await Snap.Exit();
         }));
@@ -16,7 +16,7 @@ class SnapExitBenchmarkClass : SnapExitManager<object>
 
     public async Task SnapExit_HappyPath()
     {
-        await RegisterSnapExitAsync(new Task(() =>
+        await SetupSnapExit(new Task(() =>
         {
             
         }));
@@ -26,7 +26,7 @@ class SnapExitBenchmarkClass : SnapExitManager<object>
     {
         try
         {
-            await RegisterSnapExitAsync(new Task(() =>
+            await SetupSnapExit(new Task(() =>
             {
                 throw new Exception();
             }));

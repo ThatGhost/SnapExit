@@ -1,7 +1,6 @@
 ﻿# Snap exit 3.0.0
 [![NuGet](https://img.shields.io/nuget/v/SnapExit.svg)](https://www.nuget.org/packages/SnapExit/)
 [![NuGet](https://img.shields.io/nuget/dt/SnapExit.svg)](https://www.nuget.org/packages/SnapExit/)
-[![Build Status](https://dev.azure.com/robertsundstrom/SnapExit/_apis/build/status/robertsundstrom.SnapExit?branchName=master)](https://dev.azure.com/robertsundstrom/SnapExit/_build/latest?definitionId=1&branchName=master)
 
 A nuget package that allows for exception-like behavior to validate state in any ASP.NET project, but with all the performance benefits of cancellation tokens.
 
@@ -15,7 +14,7 @@ Most of the lost performance in this benchmarks is because of the one time cost 
 
 | Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
 |------------|----------|-----------|--------------------|
-| 11_000ns   | 1300ns   | 640ns     | 1100ns             |
+| 11_400ns   | 1300ns   | 700ns     | 1100ns             |
 
 
 When u increase the stack dept the performance of exceptions becomes worse. So with a 100 deep stack these are the benchmarking results.
@@ -23,70 +22,51 @@ As you can see with a deep stack debt the performance increase can be up to **x6
 
 | Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
 |------------|----------|-----------|--------------------|
-| 450μs      | 5μs      | 1,3μs     | 1,3μs              |
+| 460μs      | 5μs      | 1,3μs     | 1,3μs              |
 
 ## Usage
 
 To throw a SnapExit it is as simple as using the static Snap class
+
 **Do not forget to await the `Snap.Exit()`. if you dont the next lines might be executed**
 ```csharp
-  public class YourService {
+    // Old way
+    throw new Exception(new {
+        // pass data to the try catch block
+    });
 
-      // New way
-      public async Task ThisShouldThrow() {
-          await Snap.Exit();
-      }
-
-      // Old way
-      public Task ThisShouldThrow() {
-          throw new Exception();
-      }
-  }
+    // New way
+    Snap.Exit(new {
+        // any response data defined in the ExitManager can be passed here
+    });
 ```
 
-This halts the flow of task immediatly, you can even return custom defined data to the return point:
+And catching it also super simple!
+
 ```csharp
-  Snap.Exit(new {
-      // any response data can be passed here
-  });
+    // Old way
+    Try{
+        await SomeTask();
+    } Catch(Exception e) {
+        // catch code
+    }
+
+    // New way
+    SetupSnapExit(SomeTask(), (response) => {
+        // catch code
+    });
 ```
 
-To make this work you will need to define a return point for SnapExit. This is made easy by using the SnapExitManager class!
+To make this work you will need to define a return point for SnapExit. This is made easy by using the ExitManager class!
 ```csharp
-  public class SnapExitReturnPoint : SnapExitManager<ResponseData> // can be inherited from or instantiated
+  public class SnapExitReturnPoint : ExitManager<ResponseData> // can be inherited from or instantiated
   {
       public async Task ThisCanBeAnyPointOfCode() {
-          onSnapExit += OnSnapExit; // analog to catch
-          Task task = SomeLongTask();
-          RegisterSnapExit(task); // analog to try
-      }
-      private Task OnSnapExit(ResponseData responseData) { // response is data passed at error time
-          // Do some code here related to an exit
+          SetupSnapExit(task, (response) => { // response is of type ResponseData
+            // any catch code goes here
+          });
       }
   }
 ```
 
-Also look at the example to see how you can turn it into a middleware for ASP.NET Core api!
-
-## Recommendation
-
-I recommend creating your own service with specialized responses based on events.
-For example:
-
-```csharp
-public class ErrorService {
-    public Task Foo(string message) {
-        await Snap.Exit(new {
-            message
-        });
-    }
-
-    public Task Bar() {
-        await Snap.Exit(new {
-            message = "Something went wrong!"
-        });
-    }
-
-    // Etc
-}
-```
+Also look at the example project to see how you can turn SnapExit into a blazingly fast middleware for ASP.NET Core api!
