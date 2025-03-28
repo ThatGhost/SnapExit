@@ -15,7 +15,7 @@ namespace SnapExit.Tests.Services
 
         // use to Assert in the unit test
         public SnapExitReponse? response;
-        public object? enviroument;
+        public object? environment;
 
         public SnapExitManagerTest(IExecutionControlService executionControlService) : base(executionControlService)
         {
@@ -24,7 +24,7 @@ namespace SnapExit.Tests.Services
 
         public async Task SetupSnapExit(SnapExitReponse response)
         {
-            _executionControlService.EnviroumentData = new { };
+            _executionControlService.EnvironmentData = new { };
             await RegisterSnapExitAsync(SomeLongTask(response));
         }
 
@@ -36,7 +36,7 @@ namespace SnapExit.Tests.Services
         protected override void SnapExitResponse(object? sender, OnSnapExitEventArgs args)
         {
             response = args.ResponseData;
-            enviroument = args.EnvironmentData;
+            environment = args.EnvironmentData;
         }
     }
 }

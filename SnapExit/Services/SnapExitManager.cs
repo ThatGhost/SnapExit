@@ -73,7 +73,7 @@ public class SnapExitManager<TResponse,TEnvironment>
     private Task InvokeOnSnapExit(ExecutionControlService executionControlService)
     {
         var responseData = (TResponse?)executionControlService.ResponseData;
-        var environmentData = (TEnvironment?)executionControlService.EnviroumentData;
+        var environmentData = (TEnvironment?)executionControlService.EnvironmentData;
 
         var args = new OnSnapExitEventArgs(responseData, environmentData);
         

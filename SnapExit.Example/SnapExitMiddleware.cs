@@ -16,7 +16,7 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
     public Task Invoke(HttpContext context, ExecutionControlService executionControlService)
     {
         // SnapExit specific setup for middleware
-        executionControlService.EnviroumentData = context;
+        executionControlService.EnvironmentData = context;
 
         // now SnapExit flings into action
         RegisterSnapExit(_next(context), executionControlService);
@@ -31,7 +31,7 @@ public sealed class SnapExitMiddleware : SnapExitManager<CustomResponseData, Htt
         if (response is null)
             throw new Exception("Something went wrong with state");
         if (context is null)
-            throw new Exception("Something went wrong with enviroument");
+            throw new Exception("Something went wrong with environment");
 
         if (context.Response.HasStarted) return;
 

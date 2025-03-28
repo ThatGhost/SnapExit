@@ -52,7 +52,7 @@ This halts the flow of task immediatly, you can even return custom defined data 
 
 To make this work you will need to define a return point for SnapExit. This is made easy by using the SnapExitManager base class!
 ```csharp
-  public class SnapExitReturnPoint : SnapExitManager<ResponseData, EnviroumentData> // the generics are to be implemented by you
+  public class SnapExitReturnPoint : SnapExitManager<ResponseData, EnvironmentData> // the generics are to be implemented by you
   {
       public void ThisCanBeAnyPointOfCode() {
           onSnapExit += OnSnapExit; // register the callback function or use the virtual protected callback
@@ -60,7 +60,7 @@ To make this work you will need to define a return point for SnapExit. This is m
           RegisterSnapExit(task);
       }
 
-      private Task OnSnapExit(ResponseData responseData, EnviroumentData enviroumentData) { // response and enviroument is data passed at error time and register time
+      private Task OnSnapExit(ResponseData responseData, EnvironmentData environmentData) { // response and environment is data passed at error time and register time
           // Do some code here related to an exit
       }
   }

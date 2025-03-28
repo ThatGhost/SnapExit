@@ -11,7 +11,7 @@ public sealed class ExecutionControlService : IExecutionControlService
     public CancellationTokenSource GetTokenSource() => _cancellationTokenSource;
 
 #pragma warning disable CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
-    public object? EnviroumentData { get; set; }
+    public object? EnvironmentData { get; set; }
 #pragma warning restore CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
 
     /// <summary>

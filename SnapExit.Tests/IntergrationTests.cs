@@ -78,6 +78,6 @@ public class MiddlewareIntegrationTests
 
         // Assert
         Assert.Equal(reponse, testService.response);
-        Assert.NotNull(testService.enviroument);
+        Assert.NotNull(testService.environment);
     }
 }
