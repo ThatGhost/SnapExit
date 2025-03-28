@@ -23,17 +23,9 @@ public class SnapExitManager<TResponse,TEnviroument>
         _executionControlService = (ExecutionControlService)executionControlService;
         onSnapExit += SnapExitResponse;
     }
-
-    private bool IsTaskCompleted(Task task)
-    {
-        return task.Status == TaskStatus.RanToCompletion
-         || task.Status == TaskStatus.Faulted
-         || task.Status == TaskStatus.Canceled;
-    }
-
     private async Task DoTaskRace(Task task, ExecutionControlService executionControlService)
     {
-        if (IsTaskCompleted(task)) return;
+        if (task.IsCompleted) return;
         
         var etc = executionControlService.GetTokenSource();
 
