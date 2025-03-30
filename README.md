@@ -5,19 +5,19 @@
 A nuget package that allows for exception-like behavior to validate state in any ASP.NET project, but with all the performance benefits of cancellation tokens.
 
 Any feedback is helpful. Please leave it in the Issues section.
-3.0 aims for a stable release with a few new features and a lot of bug fixes. From now on the package will be safelly maintained and updated with new features.
+3.0 aims for a stable release with a few new features and a lot of bug fixes. From now on the package will be safely maintained and updated with new features.
 
 ## Performance
 The package is meant to replace exceptions but still keeps the performance cost at a minimum.
-Still with a dept of 1 (worst case scenario). The performance is still **x10** over regular exception.
-Most of the lost performance in this benchmarks is because of the one time cost of initialization. When u negate for that, the loss is even smaller (-200ns).
+Still with a depth of 1 (worst case scenario). The performance is still **x10** over regular exception.
+Most of the lost performance in this benchmarks is because of the one time cost of initialization. When you account for that, the loss is even smaller (-200ns).
 
 | Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
 |------------|----------|-----------|--------------------|
 | 11_400ns   | 1300ns   | 700ns     | 1100ns             |
 
 
-When u increase the stack dept the performance of exceptions becomes worse. So with a 100 deep stack these are the benchmarking results.
+When you increase the stack depth the performance of exceptions becomes worse. So with a 100 deep stack these are the benchmarking results.
 As you can see with a deep stack debt the performance increase can be up to **x60**.
 
 | Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
@@ -41,7 +41,7 @@ To throw a SnapExit it is as simple as using the static Snap class
     });
 ```
 
-And catching it also super simple!
+And catching it is also super simple!
 
 ```csharp
     // Old way
