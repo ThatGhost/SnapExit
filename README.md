@@ -14,7 +14,7 @@ Most of the lost performance in this benchmarks is because of the one time cost 
 
 | Exceptions | SnapExit | HappyPath | SnapExit HappyPath |
 |------------|----------|-----------|--------------------|
-| 11_400ns   | 1300ns   | 700ns     | 1100ns             |
+| 13_700ns   | 1130ns   | 700ns     | 1050ns             |
 
 
 When you increase the stack depth the performance of exceptions becomes worse. So with a 100 deep stack these are the benchmarking results.
