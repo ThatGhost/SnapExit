@@ -5,20 +5,19 @@ namespace SnapExit.Services;
 
 public static class Snap
 {
-    private static readonly ConcurrentQueue<Tuple<CancellationTokenSource,bool>> _cancellationTokenSource = new();
-    private static ConcurrentQueue<Tuple<CancellationToken, object?>> ResponseData { get; set; } = new();
-    private static readonly object _lock = new();
+    private static readonly ConcurrentQueue<(CancellationTokenSource,bool)> _cancellationTokenSource = new();
+    private static ConcurrentDictionary<CancellationToken, object?> ResponseData { get; set; } = new();
 
     public static object? GetResponseData(CancellationToken token)
     {
-        return ResponseData.FirstOrDefault(r => r.Item1 == token)?.Item2;
+        return ResponseData.TryGetValue(token, out object? value) ? value : null;
     }
 
-    internal static Tuple<CancellationTokenSource, bool> GetTokenSource(bool isManager) {
-        if(_cancellationTokenSource.TryDequeue(out Tuple<CancellationTokenSource, bool>? cts) && cts is not null)
+    internal static (CancellationTokenSource, bool) GetTokenSource(bool isManager) {
+        if(_cancellationTokenSource.TryDequeue(out (CancellationTokenSource, bool) cts))
             return cts;
 
-        Tuple<CancellationTokenSource, bool> newCts = new(new(), isManager);
+        (CancellationTokenSource, bool) newCts = new(new(), isManager);
         _cancellationTokenSource.Enqueue(newCts);
         return newCts;
     }
@@ -32,7 +31,7 @@ public static class Snap
     public static async Task Exit(object customResponseData)
     {
         var cts = GetTokenSource(false);
-        ResponseData.Enqueue(new(cts.Item1.Token, customResponseData));
+        ResponseData.TryAdd(cts.Item1.Token, customResponseData);
         if(cts.Item2) cts.Item1.Cancel();
         await Task.Delay(Timeout.Infinite);
     }
