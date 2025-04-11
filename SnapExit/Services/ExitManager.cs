@@ -22,20 +22,21 @@ public class ExitManager<TResponse>
 
         if (etc.Item2)
         {
-            Task originalTask = new Task(async () =>
-            {
-                await happyPath;
-            }, etc.Item1.Token);
-
+            Task originalTask = null;
             try
             {
+                originalTask = new Task(async () =>
+                {
+                    await happyPath;
+                }, etc.Item1.Token);
+
                 if (!originalTask.IsCompleted) originalTask.Start();
                 await originalTask;
                 if (!originalTask.IsCanceled) Snap.GetTokenSource(true);
             }
             catch (TaskCanceledException) { }
 
-            if (originalTask.IsCanceled)
+            if (originalTask is not null && originalTask.IsCanceled)
             {
                 await faultyPath.Invoke((TResponse?)Snap.GetResponseData(etc.Item1.Token));
             }
